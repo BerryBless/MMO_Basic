@@ -167,7 +167,7 @@ public class MapManager
 					if (CanGo(Pos2Cell(next)) == false) // CellPos
 						continue;
 				}
-				
+
 				// 이미 방문한 곳이면 스킵
 				if (closed[next.Y, next.X])
 					continue;
@@ -180,7 +180,7 @@ public class MapManager
 					continue;
 
 				// 예약 진행
-				open[dest.Y, dest.X] = g + h;
+				open[next.Y, next.X] = g + h;
 				pq.Push(new PQNode() { F = g + h, G = g, Y = next.Y, X = next.X });
 				parent[next.Y, next.X] = new Pos(node.Y, node.X);
 			}

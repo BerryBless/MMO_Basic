@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Protocol;
 using Google.Protobuf.WellKnownTypes;
+using Server.Game;
 using ServerCore;
+using Server.Data;
 
 namespace Server
 {
@@ -24,6 +26,12 @@ namespace Server
 
 		static void Main(string[] args)
 		{
+			// "게임기획" 데이타 불러오기
+			ConfigManager.LoadConfig();
+			DataManager.LoadData();
+
+			RoomManager.Instance.Add(2); // TEST 1은 맵ID
+
 			// DNS (Domain Name System)
 			string host = Dns.GetHostName();
 			IPHostEntry ipHost = Dns.GetHostEntry(host);
@@ -34,11 +42,19 @@ namespace Server
 			Console.WriteLine("Listening...");
 
 			//FlushRoom();
-			JobTimer.Instance.Push(FlushRoom);
+			//JobTimer.Instance.Push(FlushRoom);
+
 
 			while (true)
 			{
-				JobTimer.Instance.Flush();
+				//JobTimer.Instance.Flush();
+				// TODO 무식하게 짠 업데이트 테스트 후 잡타이머로 고쳐야함
+
+				//RoomManager.Instance.Find(1).Update();
+				GameRoom room = RoomManager.Instance.Find(1);
+				room.Push(room.Update);
+
+				Thread.Sleep(100);
 			}
 		}
 	}

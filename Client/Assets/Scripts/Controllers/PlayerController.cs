@@ -1,190 +1,160 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Rendering;
 using UnityEngine;
-using static Define;
+using Google.Protobuf.Protocol;
 
 public class PlayerController : CreatureController
 {
-	Coroutine _coSkill;
-	bool _rangedSkill = false;
 
-	protected override void Init()
-	{
-		base.Init();
-	}
+    protected Coroutine _coSkill;
 
-	protected override void UpdateAnimation()
-	{
-		if (_state == CreatureState.Idle)
-		{
-			switch (_lastDir)
-			{
-				case MoveDir.Up:
-					_animator.Play("IDLE_BACK");
-					_sprite.flipX = false;
-					break;
-				case MoveDir.Down:
-					_animator.Play("IDLE_FRONT");
-					_sprite.flipX = false;
-					break;
-				case MoveDir.Left:
-					_animator.Play("IDLE_RIGHT");
-					_sprite.flipX = true;
-					break;
-				case MoveDir.Right:
-					_animator.Play("IDLE_RIGHT");
-					_sprite.flipX = false;
-					break;
-			}
-		}
-		else if (_state == CreatureState.Moving)
-		{
-			switch (_dir)
-			{
-				case MoveDir.Up:
-					_animator.Play("WALK_BACK");
-					_sprite.flipX = false;
-					break;
-				case MoveDir.Down:
-					_animator.Play("WALK_FRONT");
-					_sprite.flipX = false;
-					break;
-				case MoveDir.Left:
-					_animator.Play("WALK_RIGHT");
-					_sprite.flipX = true;
-					break;
-				case MoveDir.Right:
-					_animator.Play("WALK_RIGHT");
-					_sprite.flipX = false;
-					break;
-			}
-		}
-		else if (_state == CreatureState.Skill)
-		{
-			switch (_lastDir)
-			{
-				case MoveDir.Up:
-					_animator.Play(_rangedSkill ? "ATTACK_WEAPON_BACK" : "ATTACK_BACK");
-					_sprite.flipX = false;
-					break;
-				case MoveDir.Down:
-					_animator.Play(_rangedSkill ? "ATTACK_WEAPON_FRONT" : "ATTACK_FRONT");
-					_sprite.flipX = false;
-					break;
-				case MoveDir.Left:
-					_animator.Play(_rangedSkill ? "ATTACK_WEAPON_RIGHT" : "ATTACK_RIGHT");
-					_sprite.flipX = true;
-					break;
-				case MoveDir.Right:
-					_animator.Play(_rangedSkill ? "ATTACK_WEAPON_RIGHT" : "ATTACK_RIGHT");
-					_sprite.flipX = false;
-					break;
-			}
-		}
-		else
-		{
+    // 플레이어 초기화
+    protected override void Init()
+    {
+        base.Init();
+    }
 
-		}
-	}
+    // 플레이어 업데이트
+    protected override void UpdateController()
+    {
+        base.UpdateController();
+    }
+    [SerializeField]
+    bool _rangedSkill = false; // 활이냐 근접이냐
 
-	protected override void UpdateController()
-	{
-		switch (State)
-		{
-			case CreatureState.Idle:
-				GetDirInput();
-				break;
-			case CreatureState.Moving:
-				GetDirInput();
-				break;
-		}
-		
-		base.UpdateController();
-	}
+    // 플레이어 애니메이션 재생
+    protected override void UpdateAnimation()
+    {
+        // 처음상태에서 실행안되게
+        if (_animator == null || _sprite == null) return;
+        if (State == CreatureState.Idle)
+        {
+            switch (Dir)
+            {
+                case MoveDir.Up:
+                    _animator.Play("IDLE_BACK");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Down:
+                    _animator.Play("IDLE_FRONT");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Left:
+                    _animator.Play("IDLE_RIGHT");
+                    _sprite.flipX = true;
+                    break;
+                default:
+                    _animator.Play("IDLE_RIGHT");
+                    _sprite.flipX = false;
+                    break;
+            }
+        }
+        else if (State == CreatureState.Moving)
+        {
+            switch (Dir)
+            {
+                case MoveDir.Up:
+                    _animator.Play("WALK_BACK");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Down:
+                    _animator.Play("WALK_FRONT");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Left:
+                    _animator.Play("WALK_RIGHT");
+                    _sprite.flipX = true; // true일경우 x축을 flip(뒤집다)!
+                    break;
+                case MoveDir.Right:
+                    _animator.Play("WALK_RIGHT");
+                    _sprite.flipX = false;
+                    break;
 
-	void LateUpdate()
-	{
-		Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
-	}
+            }
+        }
+        else if (State == CreatureState.Skill)
+        {
+            switch (Dir)
+            {
+                case MoveDir.Up:
+                    _animator.Play(_rangedSkill ? "ATTACK_WEAPON_BACK" : "ATTACK_BACK");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Down:
+                    _animator.Play(_rangedSkill ? "ATTACK_WEAPON_FRONT" : "ATTACK_FRONT");
+                    _sprite.flipX = false;
+                    break;
+                case MoveDir.Left:
+                    _animator.Play(_rangedSkill ? "ATTACK_WEAPON_RIGHT" : "ATTACK_RIGHT");
+                    _sprite.flipX = true;
+                    break;
+                default:
+                    _animator.Play(_rangedSkill ? "ATTACK_WEAPON_RIGHT" : "ATTACK_RIGHT");
+                    _sprite.flipX = false;
+                    break;
+            }
+        }
+        else { }
+    }
 
-	protected override void UpdateIdle()
-	{
-		// 이동 상태로 갈지 확인
-		if (Dir != MoveDir.None)
-		{
-			State = CreatureState.Moving;
-			return;
-		}
+    public override void UseSkill(int skillId)
+    {
+        if (skillId == 1)
+        {
+            _coSkill = StartCoroutine("CoStartPunch");
+        }
+        else if(skillId == 2)
+        {
+            _coSkill = StartCoroutine("CoStartShootArrow");
+        }
+    }
 
-		// 스킬 상태로 갈지 확인
-		if (Input.GetKey(KeyCode.Space))
-		{
-			State = CreatureState.Skill;
-			//_coSkill = StartCoroutine("CoStartPunch");
-			_coSkill = StartCoroutine("CoStartShootArrow");
-		}
-	}
+    // 펀치 코루틴
+    IEnumerator CoStartPunch()
+    {
+        // 피격 판정은 서버에서
 
-	// 키보드 입력
-	void GetDirInput()
-	{
-		if (Input.GetKey(KeyCode.W))
-		{
-			Dir = MoveDir.Up;
-		}
-		else if (Input.GetKey(KeyCode.S))
-		{
-			Dir = MoveDir.Down;
-		}
-		else if (Input.GetKey(KeyCode.A))
-		{
-			Dir = MoveDir.Left;
-		}
-		else if (Input.GetKey(KeyCode.D))
-		{
-			Dir = MoveDir.Right;
-		}
-		else
-		{
-			Dir = MoveDir.None;			
-		}
-	}
+        // 쿨타임
+        _rangedSkill = false;
+        State = CreatureState.Skill;
+        yield return new WaitForSeconds(0.3f);
+        State = CreatureState.Idle;
+        _coSkill = null; 
+        CheckUpdateFlag();
+    }
+    // 활쏘기 코루틴
+    IEnumerator CoStartShootArrow()
+    {
+        // 쿨타임
+        _rangedSkill = true;
+        State = CreatureState.Skill;
+        yield return new WaitForSeconds(0.3f);
+        State = CreatureState.Idle;
+        _coSkill = null; 
+        CheckUpdateFlag();
+    }
 
-	IEnumerator CoStartPunch()
-	{
-		// 피격 판정
-		GameObject go = Managers.Object.Find(GetFrontCellPos());
-		if (go != null)
-		{
-			CreatureController cc = go.GetComponent<CreatureController>();
-			if (cc != null)
-				cc.OnDamaged();
-		}
+    
 
-		// 대기 시간
-		_rangedSkill = false;
-		yield return new WaitForSeconds(0.5f);
-		State = CreatureState.Idle;
-		_coSkill = null;
-	}
+    public override void OnDamaged()
+    {
+        Debug.Log("PlayerHIT!");
+    }
 
-	IEnumerator CoStartShootArrow()
-	{
-		GameObject go = Managers.Resource.Instantiate("Creature/Arrow");
-		ArrowController ac = go.GetComponent<ArrowController>();
-		ac.Dir = _lastDir;
-		ac.CellPos = CellPos;
+    protected virtual void CheckUpdateFlag()
+    {
+        
+    }
+    public override void SynkPos()
+    {
+        Vector3 destPos = Managers.Map.CurrentGrid.CellToWorld(CellPos) + _sprightCorrection; // 오차값
+        transform.position = destPos;
+    }
+    public override void OnDead()
+    {
+        base.OnDead();
 
-		// 대기 시간
-		_rangedSkill = true;
-		yield return new WaitForSeconds(0.3f);
-		State = CreatureState.Idle;
-		_coSkill = null;
-	}
-
-	public override void OnDamaged()
-	{
-		Debug.Log("Player HIT !");
-	}
+        Managers.Object.Remove(Id);
+        Managers.Resource.Destroy(gameObject);
+    }
 }
