@@ -1,10 +1,13 @@
 ﻿using Google.Protobuf.Protocol;
 using Microsoft.EntityFrameworkCore;
+using Server.Data;
 using Server.DB;
+using Server.Game;
 using ServerCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Server
@@ -35,9 +38,10 @@ namespace Server
                 { // 로그인 성공
                     AccountDbId = findAccount.AccountId;        // Id는 자주쓰니 기억
                     S_Login loginOk = new S_Login() { LoginOk = 1 };
-                    foreach(PlayerDb playerDb in findAccount.Players)
+                    foreach (PlayerDb playerDb in findAccount.Players)
                     {
-                        LobbyPlayerInfo lobbyPlayer = new LobbyPlayerInfo() {
+                        LobbyPlayerInfo lobbyPlayer = new LobbyPlayerInfo()
+                        {
                             Name = playerDb.PlayerName,
                             StatInfo = new StatInfo()
                             {
@@ -56,7 +60,7 @@ namespace Server
                         loginOk.Players.Add(lobbyPlayer);
 
                     }
-                    this.Send(loginOk);
+                    Send(loginOk);
 
                     // 로비로 이동
                     ServerState = PlayerServerState.ServerStateLobby;
@@ -68,16 +72,108 @@ namespace Server
                     db.Accounts.Add(newAccount);
                     db.SaveChanges();   // TODO : Exception
 
-                    AccountDbId = findAccount.AccountId;        // Id는 자주쓰니 기억
+                    AccountDbId = newAccount.AccountId;        // Id는 자주쓰니 기억
 
                     // 로그인 실패
                     S_Login loginOk = new S_Login() { LoginOk = 1 };
-                    this.Send(loginOk);
+                    Send(loginOk);
 
                     // 로비로 이동
                     ServerState = PlayerServerState.ServerStateLobby;
                 }
             }
+        }
+
+        public void HandleCreatePlayer(C_CreatePlayer createPacket)
+        {
+            // 로비에서만 가능
+            if (ServerState != PlayerServerState.ServerStateLobby) return;
+
+            using (AppDbContext db = new AppDbContext())
+            {
+                // 찾는거 딱히 의미없음.. 동시에 같은 이름 올 수 도있음
+                PlayerDb findPlayer = db.Players
+                    .Where(p => p.PlayerName == createPacket.Name)
+                    .FirstOrDefault();
+
+                if(findPlayer != null)
+                {
+                    // 겹치니 못만든다는 뜻으로 null 패킷 보냄
+                    Send(new S_CreatePlayer());
+                }
+
+                else
+                {
+                    // 기획상의 1렙 스텟
+                    StatInfo stat = null;
+                    DataManager.StatDict.TryGetValue(1, out stat);
+
+                    // DB에 플레이어 추가
+                    PlayerDb newPlayerDb = new PlayerDb()
+                    {
+                        AccountId = AccountDbId,
+                        PlayerName = createPacket.Name,
+                        Level = stat.Level,
+                        Hp = stat.Hp,
+                        MaxHp = stat.MaxHp,
+                        Attack = stat.Attack,
+                        Speed = stat.Speed,
+                        TotalExp = 0
+                    };
+
+                    db.Players.Add(newPlayerDb);
+                    db.SaveChanges(); // TODO 예외처리 겹친이름등
+
+                    // 메모리에 추가
+                    LobbyPlayerInfo lobbyPlayer = new LobbyPlayerInfo()
+                    {
+                        Name = newPlayerDb.PlayerName,
+                        StatInfo = new StatInfo()
+                        {
+                            Level = newPlayerDb.Level,
+                            Hp = newPlayerDb.Hp,
+                            MaxHp = newPlayerDb.MaxHp,
+                            Attack = newPlayerDb.Attack,
+                            Speed = newPlayerDb.Speed,
+                            TotalExp = newPlayerDb.TotalExp
+                        }
+                    };
+
+                    LobbyPlayers.Add(lobbyPlayer);
+
+                    // 성공 전송
+                    S_CreatePlayer newPlayerPacket = new S_CreatePlayer() { Player = new LobbyPlayerInfo()};
+                    newPlayerPacket.Player.MergeFrom(lobbyPlayer);
+                    Send(newPlayerPacket);
+                }
+            }
+        }
+
+        // 게임입장
+        public void HandleEnterGame(C_EnterGame enterGamePacket)
+        {
+            if (ServerState != PlayerServerState.ServerStateLobby) return;
+
+            LobbyPlayerInfo playerInfo =  LobbyPlayers.Find(p => p.Name == enterGamePacket.Name);
+            if (playerInfo == null) return;
+
+            // 로비에서 캐릭터 선택완료
+            MyPlayer = Game.ObjectManager.Instance.Add<Player>();
+            {
+                MyPlayer.Info.Name = playerInfo.Name;
+                MyPlayer.Info.PosInfo.State = CreatureState.Idle;
+                MyPlayer.Info.PosInfo.MoveDir = MoveDir.Down;
+                MyPlayer.Info.PosInfo.PosX = 0;
+                MyPlayer.Info.PosInfo.PosY = 0;
+                MyPlayer.Stat.MergeFrom(playerInfo.StatInfo);
+                MyPlayer.Session = this;
+            }
+
+            ServerState = PlayerServerState.ServerStateGame;
+            // TODO 룸번호 바꾸기
+            //RoomManager.Instance.Find(1).EnterGame(MyPlayer);
+            GameRoom room = RoomManager.Instance.Find(1);
+            room.Push(room.EnterGame, MyPlayer);
         }
     }
 }

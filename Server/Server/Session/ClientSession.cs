@@ -46,28 +46,6 @@ namespace Server
 				S_Connected connectedPacket = new S_Connected();
 				Send(connectedPacket);
             }
-
-			// TODO DB에서 데이터 뽑아오기
-			// Test코드 로비에서 캐릭터 선택
-			MyPlayer = ObjectManager.Instance.Add<Player>();
-            {
-				MyPlayer.Info.Name = $"Player_{MyPlayer.Info.ObjectId}";
-				MyPlayer.Info.PosInfo.State = CreatureState.Idle;
-				MyPlayer.Info.PosInfo.MoveDir = MoveDir.Down;
-				MyPlayer.Info.PosInfo.PosX =0;
-				MyPlayer.Info.PosInfo.PosY =0;
-
-				StatInfo stat = null;
-				DataManager.StatDict.TryGetValue(1, out stat);
-				MyPlayer.Stat.MergeFrom(stat);
-
-				MyPlayer.Session = this;
-            }
-
-			// TODO 입장요청 패킷 들어오면
-			//RoomManager.Instance.Find(1).EnterGame(MyPlayer);
-			GameRoom room = RoomManager.Instance.Find(1);
-			room.Push(room.EnterGame, MyPlayer);
 		}
 
 		public override void OnRecvPacket(ArraySegment<byte> buffer)

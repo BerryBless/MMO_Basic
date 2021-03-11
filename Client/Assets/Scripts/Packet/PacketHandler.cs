@@ -115,21 +115,54 @@ class PacketHandler
 
     }
 
-    public static void S_LoginHandler(PacketSession session, IMessage packet)// 로그인
+    public static void S_LoginHandler(PacketSession session, IMessage packet)// 로그인 + 캐릭터 목록
     {
         S_Login loginPacket = packet as S_Login;
         // TODO 로그인 성공/실패
 
         Debug.Log($"loginOK({loginPacket.LoginOk})");
+
+        // TODO : 로비에서 캐릭터 목록 보여주고, 선택
+        if(loginPacket.Players == null || loginPacket.Players.Count == 0)
+        {
+            C_CreatePlayer createPacket = new C_CreatePlayer();
+            createPacket.Name = $"Player_{Random.Range(0, 10000).ToString("0000")}";
+            Managers.Network.Send(createPacket);
+        }
+        else
+        {
+            // 무조건 첫번쨰 캐릭터 로그인
+            LobbyPlayerInfo info = loginPacket.Players[0];
+
+            C_EnterGame enterGamePacket = new C_EnterGame();
+            enterGamePacket.Name = info.Name;
+            Managers.Network.Send(enterGamePacket);
+        }
     }
-    public static void S_CreatePlayerHandler(PacketSession session, IMessage packet)// 맵바꾸기
+    public static void S_CreatePlayerHandler(PacketSession session, IMessage packet)// 플레이어 생성
     {
-        S_CreatePlayer createPlayerPacket = packet as S_CreatePlayer;
+        S_CreatePlayer createOkPacket = packet as S_CreatePlayer;
+
+        if(createOkPacket.Player == null)
+        {
+            // 플레이어 만들기 실패
+            C_CreatePlayer createPacket = new C_CreatePlayer();
+            createPacket.Name = $"Player_{Random.Range(0, 10000).ToString("0000")}";
+            Managers.Network.Send(createPacket);
+        }
+        else
+        {
+            C_EnterGame enterGamePacket = new C_EnterGame();
+            enterGamePacket.Name = createOkPacket.Player.Name;
+            Managers.Network.Send(enterGamePacket);
+        }
     }
 
     public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
     {
         S_ChangeMap changeMapPacket = packet as S_ChangeMap;
+        // TODO 맵바꾸기
+        Managers.Map.LoadMap(changeMapPacket.MapId);
     }
    
 }
