@@ -12,7 +12,6 @@ class PacketHandler
     {
         S_EnterGame enterGamePacket = packet as S_EnterGame;
         Managers.Object.Add(enterGamePacket.Player, myPlayer: true);
-
     }
     public static void S_LeaveGameHandler(PacketSession session, IMessage packet)// "이몸퇴장"
     {
@@ -46,8 +45,13 @@ class PacketHandler
         GameObject go = Managers.Object.Find(movePacket.ObjectId);
         if (go == null) return;
 
+
+        if (movePacket.ObjectId == Managers.Object.MyPlayer.Id) return;
+
         BaseController bc = go.GetComponent<BaseController>();
         if (bc == null) return;
+
+
 
         //Debug.Log($"S_MoveHandler ::\n\t{cc.gameObject.name} :: CellPos ({cc.PosInfo.PosX},{cc.PosInfo.PosY}) | Dir : {cc.PosInfo.MoveDir}");
         bc.PosInfo = movePacket.PosInfo;

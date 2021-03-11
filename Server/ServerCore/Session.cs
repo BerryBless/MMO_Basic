@@ -7,6 +7,7 @@ using System.Threading;
 
 namespace ServerCore
 {
+	// 세션
 	public abstract class PacketSession : Session
 	{
 		public static readonly int HeaderSize = 2;

@@ -14,21 +14,6 @@ namespace Server.Game
         public int X;
     }
 
-    public struct PQNode : IComparable<PQNode>
-    {
-        public int F;
-        public int G;
-        public int Y;
-        public int X;
-
-        public int CompareTo(PQNode other)
-        {
-            if (F == other.F)
-                return 0;
-            return F < other.F ? 1 : -1;
-        }
-    }
-
     public struct Vector2Int
     {
         public int x;
@@ -53,7 +38,6 @@ namespace Server.Game
         {
             return new Vector2Int(a.x - b.x, a.y - b.y);
         }
-
     }
 
     public class Map
@@ -69,8 +53,6 @@ namespace Server.Game
 
         bool[,] _collision;
         GameObject[,] _objects; // 오브젝트 충돌!
-
-        
 
         public void LoadMap(int mapId) {
             LoadMap(mapId, "../../../../../Common/MapData");
@@ -88,15 +70,13 @@ namespace Server.Game
             MinY = int.Parse(reader.ReadLine());
             MaxY = int.Parse(reader.ReadLine());
 
-            int xCount = MaxX - MinX + 1;
-            int yCount = MaxY - MinY + 1;
-            _collision = new bool[yCount, xCount];
-            _objects = new GameObject[yCount, xCount];
+            _collision = new bool[SizeY, SizeX];
+            _objects = new GameObject[SizeY, SizeX];
 
-            for (int y = 0; y < yCount; y++)
+            for (int y = 0; y < SizeY; y++)
             {
                 string line = reader.ReadLine();
-                for (int x = 0; x < xCount; x++)
+                for (int x = 0; x < SizeX; x++)
                 {
                     _collision[y, x] = (line[x] == '1' ? true : false);
                 }
@@ -140,8 +120,12 @@ namespace Server.Game
         {
             // 유효성 체크
             if (gameObject == null) return false;
+            if (gameObject.Room == null) return false;
+            if (gameObject.Room.Map == null) return false;
+
             GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.Id);
 
+            // 올바른 좌표 확인
             PositionInfo posInfo = gameObject.Info.PosInfo;
             if (posInfo.PosX < MinX || posInfo.PosX > MaxX)
                 return false;
@@ -160,6 +144,7 @@ namespace Server.Game
             return true;
         }
 
+        // 셀포지션의 게임오브젝트 반환
         public GameObject Find(Vector2Int cellPos)
         {
             if (cellPos.x < MinX || cellPos.x > MaxX)
@@ -171,12 +156,26 @@ namespace Server.Game
             return _objects[y, x];
         }
 
-
+        // 맵 삭제
         public void DestroyMap()
         {
         }
 
         #region A* PathFinding
+        public struct PQNode : IComparable<PQNode>
+        {
+            public int F;
+            public int G;
+            public int Y;
+            public int X;
+
+            public int CompareTo(PQNode other)
+            {
+                if (F == other.F)
+                    return 0;
+                return F < other.F ? 1 : -1;
+            }
+        }
 
         // U D L R
         int[] _deltaY = new int[] { 1, -1, 0, 0 };

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace ServerCore
 {
+	// 우선순위 큐
 	public class PriorityQueue<T> where T : IComparable<T>
 	{
 		List<T> _heap = new List<T>();

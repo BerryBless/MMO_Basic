@@ -39,7 +39,7 @@ namespace Server
 			Console.WriteLine($"OnConnected : {endPoint}");
 
 			// TODO DB에서 데이터 뽑아오기
-			// Proto Test코드
+			// Test코드
 			MyPlayer = ObjectManager.Instance.Add<Player>();
             {
 				MyPlayer.Info.Name = $"Player_{MyPlayer.Info.ObjectId}";

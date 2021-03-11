@@ -27,8 +27,8 @@ namespace Server.Game
                 _roomId++;
             }
             return gameRoom;
-
         }
+
         public bool Remove(int roomId)
         {
             lock (_lock)

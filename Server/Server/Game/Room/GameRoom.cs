@@ -22,11 +22,13 @@ namespace Server.Game
 
             // TEMP 테스트할몬스터 만들기
             Monster monster = ObjectManager.Instance.Add<Monster>();
-            monster.CellPos = new Vector2Int(5, 5);
+            monster.CellPos = new Vector2Int(6, 6);
             this.Push(this.EnterGame,monster);
+
         }
 
 
+        // 누군가 주기적으로 호출해야 겜돌아감
         public void Update()
         {
             foreach (Projectile projectile in _projectile.Values)
@@ -39,6 +41,7 @@ namespace Server.Game
                 monster.Update();
             }
 
+            Flush();
         }
         // 오브젝트 룸에서 생성해욧
         public void EnterGame(GameObject gameObject)
@@ -116,8 +119,6 @@ namespace Server.Game
         {
             GameObjectType type = ObjectManager.GetObjectTypeById(objectId);
 
-
-
             if (type == GameObjectType.Player)
             {
 
@@ -135,12 +136,12 @@ namespace Server.Game
             }
             else if (type == GameObjectType.Monster)
             {
-                // TODO 몬스터 룸에서 삭제
+                // 몬스터 룸에서 삭제
                 Monster monster;
                 if (_monsters.Remove(objectId, out monster) == false) return;
 
-                monster.Room = null;
                 Map.ApllyLeave(monster);
+                monster.Room = null;
             }
             else if (type == GameObjectType.Projectile)
             {
@@ -162,9 +163,6 @@ namespace Server.Game
                 }
 
             }
-
-
-
         }
 
         // C_Move패킷핸들러에서 변경할 내용 

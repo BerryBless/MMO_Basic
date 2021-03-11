@@ -8,7 +8,7 @@ public class CreatureController : BaseController
     HpBar _hpBar;
 
     [SerializeField]
-    public Vector3 _sprightCorrection = new Vector3(0.5f, 0.8f);       // 캐릭터 스프라이트를 그리드안에 넣기위한 오차값
+    protected Vector3 _sprightCorrection = new Vector3(0.5f, 0.5f);       // 캐릭터 스프라이트를 그리드안에 넣기위한 오차값
 
 
     [SerializeField]

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace ServerCore
 {
+	// 다른 서버와 병열처리 가능하게 다른서버와 연결해주는 부분
 	public class Connector
 	{
 		Func<Session> _sessionFactory;

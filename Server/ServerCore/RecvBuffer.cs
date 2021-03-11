@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ServerCore
 {
+	// 패킷을 진짜로 받는 부분
+	// 패킷이 잘 도착했는지 확인(받은 패킷이랑 프로토콜패킷의 dataSize가 같으면 잘도착함)
+	// 잘못온거 보관하다가 남은 데이터 오면 완전한 패킷 만들어서 처리 보내기
 	public class RecvBuffer
 	{
 		// [r][][w][][][][][][][]

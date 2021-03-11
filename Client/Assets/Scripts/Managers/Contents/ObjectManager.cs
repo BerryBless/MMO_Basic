@@ -38,7 +38,7 @@ public class ObjectManager
                 MyPlayer.Id = info.ObjectId;
                 MyPlayer.PosInfo = info.PosInfo;
                 MyPlayer.Stat = info.StatInfo;
-
+                
                 MyPlayer.SynkPos();
             }
             else

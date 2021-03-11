@@ -18,11 +18,18 @@ namespace Server
 	class Program
 	{
 		static Listener _listener = new Listener();
+		static List<System.Timers.Timer> _timers = new List<System.Timers.Timer>();
 
-		static void FlushRoom()
-		{
-			JobTimer.Instance.Push(FlushRoom, 250);
-		}
+		static void TickRoom(GameRoom room, int tick = 100)
+        {
+			var timer = new System.Timers.Timer();
+			timer.Interval = tick;
+			timer.Elapsed += ((s, e) => { room.Update(); });
+			timer.AutoReset = true;
+			timer.Enabled = true;
+
+			_timers.Add(timer);
+        }
 
 		static void Main(string[] args)
 		{
@@ -30,7 +37,9 @@ namespace Server
 			ConfigManager.LoadConfig();
 			DataManager.LoadData();
 
-			RoomManager.Instance.Add(2); // TEST 1은 맵ID
+			// 룸 생성
+			GameRoom room = RoomManager.Instance.Add(2); // TEST 2는 맵ID
+			TickRoom(room, 50);
 
 			// DNS (Domain Name System)
 			string host = Dns.GetHostName();
@@ -41,19 +50,8 @@ namespace Server
 			_listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });
 			Console.WriteLine("Listening...");
 
-			//FlushRoom();
-			//JobTimer.Instance.Push(FlushRoom);
-
-
 			while (true)
 			{
-				//JobTimer.Instance.Flush();
-				// TODO 무식하게 짠 업데이트 테스트 후 잡타이머로 고쳐야함
-
-				//RoomManager.Instance.Find(1).Update();
-				GameRoom room = RoomManager.Instance.Find(1);
-				room.Push(room.Update);
-
 				Thread.Sleep(100);
 			}
 		}

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace ServerCore
 {
+	// 클라이언트 세션이랑 서버랑 소켓 연결해주는 부분
 	public class Listener
 	{
 		Socket _listenSocket;
