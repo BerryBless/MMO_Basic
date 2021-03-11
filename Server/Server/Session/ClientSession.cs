@@ -13,12 +13,16 @@ using Server.Data;
 
 namespace Server
 {
-	public class ClientSession : PacketSession
+	public partial class ClientSession : PacketSession
 	{
+		public PlayerServerState ServerState { get; private set; } = PlayerServerState.ServerStateLogin;
 		public Player MyPlayer { get; set; }
 		public int SessionId { get; set; }
 
-		public void Send(IMessage packet)
+
+
+        #region NETWORK
+        public void Send(IMessage packet)
         {
 			// 패킷 이름을 이용해서 ID를 정함
 			string msgName = packet.Descriptor.Name.Replace("_", string.Empty); // S_Chat => SChat
@@ -38,8 +42,13 @@ namespace Server
 		{
 			Console.WriteLine($"OnConnected : {endPoint}");
 
+            {
+				S_Connected connectedPacket = new S_Connected();
+				Send(connectedPacket);
+            }
+
 			// TODO DB에서 데이터 뽑아오기
-			// Test코드
+			// Test코드 로비에서 캐릭터 선택
 			MyPlayer = ObjectManager.Instance.Add<Player>();
             {
 				MyPlayer.Info.Name = $"Player_{MyPlayer.Info.ObjectId}";
@@ -55,6 +64,7 @@ namespace Server
 				MyPlayer.Session = this;
             }
 
+			// TODO 입장요청 패킷 들어오면
 			//RoomManager.Instance.Find(1).EnterGame(MyPlayer);
 			GameRoom room = RoomManager.Instance.Find(1);
 			room.Push(room.EnterGame, MyPlayer);
@@ -81,5 +91,6 @@ namespace Server
 		{
 			//Console.WriteLine($"Transferred bytes: {numOfBytes}");
 		}
-	}
+        #endregion
+    }
 }

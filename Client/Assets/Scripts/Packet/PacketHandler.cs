@@ -25,7 +25,7 @@ class PacketHandler
 
         foreach (ObjectInfo obj in spawnPacket.Objects)
         {
-            Debug.Log($"S_MoveHandler ::\n\t{obj.ObjectId} :: CellPos ({obj.PosInfo.PosX},{obj.PosInfo.PosY}) | Dir : {obj.PosInfo.MoveDir}");
+            //Debug.Log($"S_MoveHandler ::\n\t{obj.ObjectId} :: CellPos ({obj.PosInfo.PosX},{obj.PosInfo.PosY}) | Dir : {obj.PosInfo.MoveDir}");
             Managers.Object.Add(obj, myPlayer: false);
         }
     }
@@ -67,6 +67,7 @@ class PacketHandler
         CreatureController cc = go.GetComponent<CreatureController>();
         if (cc != null)
         {
+            Debug.Log($"skillPacket.Info.SkillId({skillPacket.Info.SkillId})");
             cc.UseSkill(skillPacket.Info.SkillId);
         }
 
@@ -101,4 +102,34 @@ class PacketHandler
         }
 
     }
+    public static void S_ConnectedHandler(PacketSession session, IMessage packet)// 연결
+    {
+        // S_Connected connectedPacket = packet as S_Connected;
+        // TODO 연결중입니다
+
+        Debug.Log("S_ConnectedHandler");
+        C_Login loginPacket = new C_Login();
+        loginPacket.UniqueId = SystemInfo.deviceUniqueIdentifier;
+
+        Managers.Network.Send(loginPacket);
+
+    }
+
+    public static void S_LoginHandler(PacketSession session, IMessage packet)// 로그인
+    {
+        S_Login loginPacket = packet as S_Login;
+        // TODO 로그인 성공/실패
+
+        Debug.Log($"loginOK({loginPacket.LoginOk})");
+    }
+    public static void S_CreatePlayerHandler(PacketSession session, IMessage packet)// 맵바꾸기
+    {
+        S_CreatePlayer createPlayerPacket = packet as S_CreatePlayer;
+    }
+
+    public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
+    {
+        S_ChangeMap changeMapPacket = packet as S_ChangeMap;
+    }
+   
 }

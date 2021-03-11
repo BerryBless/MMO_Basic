@@ -41,7 +41,7 @@ namespace Server.Game
                 if (target != null)
                 {
                     // 피격판정
-                    Console.WriteLine($"{target.Info.Name}  Damaged : {Data.damage}");
+                    //Console.WriteLine($"{target.Info.Name}  Damaged : {Data.damage}");
                     target.OnDamaged(this, Data.damage + Owner.Stat.Attack);
                 }
                 // 소멸

@@ -8,6 +8,12 @@ namespace Server.Game
 {
     class Monster : GameObject
     {
+        public int _ClassID {get; private set;} // 직업ID 1이면 근접 2면 화살
+        int _searchCellDist = 10;   // 탐색범위
+        int _chaseCellDist = 20;    // 얼마나 멀어질떄까지 쫒아가냐
+
+        int _skillRange = 1;        // TEMP 스킬 사거리 데이터로 관리해줘야함
+
         public Monster() {
             ObjectType = GameObjectType.Monster;
 
@@ -18,11 +24,26 @@ namespace Server.Game
             Stat.Hp = 100;
             Stat.Speed = 5.0f;
 
+            //TODO 데이터 관리할때 몬스터 종류도 넣어주기
+            _ClassID = 1;
+
+            if(_ClassID == 1)
+            {
+                _searchCellDist = 10;
+                _chaseCellDist = 20;
+                _skillRange = 1;
+            }
+            else if(_ClassID == 2)
+            {
+                _searchCellDist = 20;
+                _chaseCellDist = 25;
+                _skillRange = 5;
+            }
+
             State = CreatureState.Idle;
         }
 
         // 고정 상태 기계 AI
-
         public override void Update()
         {
             switch (State)
@@ -46,10 +67,6 @@ namespace Server.Game
         long _nextSearchTick = 0;   // 서치 틱카운트
         long _nextMovehTick = 0;    // 무브 틱카운트
 
-        int _searchCellDist = 10;   // 탐색범위
-        int _chaseCellDist = 20;    // 얼마나 멀어질떄까지 쫒아가냐
-
-        int _skillRange = 1;        // TEMP 스킬 사거리 데이터로 관리해줘야함
 
         protected virtual void UpdateIdle() {
             if (_nextSearchTick > Environment.TickCount64) return; // 서칭 쿨타임중
@@ -152,13 +169,19 @@ namespace Server.Game
                     Dir = lookDir;                  // 스킬 쓸 방향이 다르면.. 방향 바라보게
                     BroadcastMove();
                 }
+                // 사용할 스킬정하기!
+                Skill skillData = null;                              // 데이터 에서 몬스터 데이터 불러오기
+                DataManager.SkillDict.TryGetValue(_ClassID, out skillData); // TEMP 몬스터도 플레이어 스킬 영향받음
+                if (_ClassID == 1)
+                {
+                    // 데미지 판정
 
-                // 데미지 판정
-                Skill skillData = null;                              // TODO 데이터 에서 몬스터 데이터 불러오기
-                DataManager.SkillDict.TryGetValue(1, out skillData); // TEMP 몬스터도 플레이어 스킬 영향받음
-
-                _target.OnDamaged(this, skillData.damage + Stat.Attack);
-
+                    _target.OnDamaged(this, skillData.damage + Stat.Attack);
+                }
+                else if (_ClassID == 2)
+                {
+                    Room.SpawnProjectile(this, skillData);
+                }
 
                 // 사용했다! Breadcasting
                 S_Skill skill = new S_Skill() { Info = new SkillInfo() };
@@ -169,6 +192,10 @@ namespace Server.Game
                 // 스킬 쿨타임 적용
                 int coolTick = (int)(1000 * skillData.cooldown);
                 _coolTick = Environment.TickCount64 + coolTick;
+
+
+
+
             }
 
             if (_coolTick > Environment.TickCount64)
@@ -176,6 +203,8 @@ namespace Server.Game
 
             _coolTick = 0;
         }
+
+
         protected virtual void UpdateDead() {
         }
 

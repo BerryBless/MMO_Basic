@@ -12,48 +12,51 @@ using Google.Protobuf.WellKnownTypes;
 using Server.Game;
 using ServerCore;
 using Server.Data;
+using Server.DB;
 
 namespace Server
 {
-	class Program
-	{
-		static Listener _listener = new Listener();
-		static List<System.Timers.Timer> _timers = new List<System.Timers.Timer>();
+    class Program
+    {
+        static Listener _listener = new Listener();
+        static List<System.Timers.Timer> _timers = new List<System.Timers.Timer>();
 
-		static void TickRoom(GameRoom room, int tick = 100)
+        static void TickRoom(GameRoom room, int tick = 100)
         {
-			var timer = new System.Timers.Timer();
-			timer.Interval = tick;
-			timer.Elapsed += ((s, e) => { room.Update(); });
-			timer.AutoReset = true;
-			timer.Enabled = true;
+            var timer = new System.Timers.Timer();
+            timer.Interval = tick;
+            timer.Elapsed += ((s, e) => { room.Update(); });
+            timer.AutoReset = true;
+            timer.Enabled = true;
 
-			_timers.Add(timer);
+            _timers.Add(timer);
         }
 
-		static void Main(string[] args)
-		{
-			// "게임기획" 데이타 불러오기
-			ConfigManager.LoadConfig();
-			DataManager.LoadData();
+        static void Main(string[] args)
+        {
+            // "게임기획" 데이타 불러오기
+            ConfigManager.LoadConfig();
+            DataManager.LoadData();
 
-			// 룸 생성
-			GameRoom room = RoomManager.Instance.Add(2); // TEST 2는 맵ID
-			TickRoom(room, 50);
 
-			// DNS (Domain Name System)
-			string host = Dns.GetHostName();
-			IPHostEntry ipHost = Dns.GetHostEntry(host);
-			IPAddress ipAddr = ipHost.AddressList[0];
-			IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
+            // 룸 생성
+            int mapId = 1;
+            GameRoom room = RoomManager.Instance.Add(mapId); // TEMP 1은 맵ID
+            TickRoom(room, 50);
 
-			_listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });
-			Console.WriteLine("Listening...");
+            // DNS (Domain Name System)
+            string host = Dns.GetHostName();
+            IPHostEntry ipHost = Dns.GetHostEntry(host);
+            IPAddress ipAddr = ipHost.AddressList[0];
+            IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
-			while (true)
-			{
-				Thread.Sleep(100);
-			}
-		}
-	}
+            _listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });
+            Console.WriteLine("Listening...");
+
+            while (true)
+            {
+                Thread.Sleep(100);
+            }
+        }
+    }
 }

@@ -57,8 +57,21 @@ namespace Server.Game
                 Player player = gameObject as Player;
                 // 플레이어가 룸안에 들어옴
                 _players.Add(gameObject.Id, player);
-                Map.ApllyMove(player, new Vector2Int(player.CellPos.x, player.CellPos.y));
                 player.Room = this;
+
+                bool isApllyMove = Map.ApllyMove(player, new Vector2Int(player.CellPos.x, player.CellPos.y));
+
+                if (isApllyMove == false)
+                {
+                    //Console.WriteLine($"isApllyMove :: {isApllyMove}");
+                    
+                }
+                // 클라이언트에게 Room 에서 처리하고 있는 맵을 로드하라!
+                {
+                    S_ChangeMap changeMapPacket = new S_ChangeMap();
+                    changeMapPacket.MapId = this.Map.MapID;
+                    player.Session.Send(changeMapPacket);
+                }
 
                 // 본인한테 Room 에 있던 player정보 전송
                 {
@@ -125,8 +138,14 @@ namespace Server.Game
                 Player player;
                 if (_players.Remove(objectId, out player) == false) return;
 
+                bool isApllyLeave = Map.ApllyLeave(player);
                 player.Room = null;
-                Map.ApllyLeave(player);
+
+                if(isApllyLeave == false)
+                {
+                    //Console.WriteLine($"isApllyLeave :: {isApllyLeave}");
+                    //isApllyLeave = Map.ApllyLeave(player);
+                }
 
                 // 본인한테 정보 전송
                 {
@@ -229,29 +248,14 @@ namespace Server.Game
                 case SkillType.SkillAuto: // 평타
                                           // 데미지 판정
                     Vector2Int skillPos = player.GetFrontCellPos(info.PosInfo.MoveDir);
-                    Object target = Map.Find(skillPos);
+                    GameObject target = Map.Find(skillPos);
                     if (target != null)
                     {
-                        //Console.WriteLine($"HIT Object ");
+                        this.Push(target.OnDamaged, player, player.Info.StatInfo.Attack);
                     }
                     break;
-                case SkillType.SkillProjectile: // 활
-                                                // TODO 투사체 더만들떄 관리
-                    Arrow arrow = ObjectManager.Instance.Add<Arrow>();
-
-                    if (arrow == null)
-                        return;
-                    arrow.Data = skillData;                         // 해당스킬의 정보시트
-                    arrow.Owner = player;                           // 주인은 플레이어
-                    arrow.PosInfo.State = CreatureState.Moving;     // 화살은 계속 움직임
-                    arrow.PosInfo.PosX = player.PosInfo.PosX;       // 화살 생성위치
-                    arrow.PosInfo.PosY = player.PosInfo.PosY;
-                    arrow.PosInfo.MoveDir = player.PosInfo.MoveDir;
-                    arrow.Speed = skillData.projectile.speed;       // 화살정보 입력
-                                                                    // 화살 입갤
-                    //EnterGame(arrow);
-                    this.Push(this.EnterGame, arrow);
-
+                case SkillType.SkillProjectile: // 투사체
+                    SpawnProjectile(player, skillData);
                     break;
                 case SkillType.SkillNone:
                     break;
@@ -260,6 +264,28 @@ namespace Server.Game
             }
 
         }
+
+        public void SpawnProjectile(GameObject owner, Data.Skill skillData)
+        {
+
+            if (skillData.projectile.name == "Arrow") {
+                Arrow arrow = ObjectManager.Instance.Add<Arrow>();
+
+                if (arrow == null)
+                    return;
+                arrow.Data = skillData;                         // 해당스킬의 정보시트
+                arrow.Owner = owner;                           // 주인은 플레이어
+                arrow.PosInfo.State = CreatureState.Moving;     // 화살은 계속 움직임
+                arrow.PosInfo.PosX = owner.PosInfo.PosX;       // 화살 생성위치
+                arrow.PosInfo.PosY = owner.PosInfo.PosY;
+                arrow.PosInfo.MoveDir = owner.PosInfo.MoveDir;
+                arrow.Speed = skillData.projectile.speed;       // 화살정보 입력
+                                                                // 화살 입갤
+                this.Push(this.EnterGame, arrow);//EnterGame(arrow);
+            }
+            // else if (skillData.projectile.name == "FireBall") {} // TODO 다른 투사체
+        }
+
 
         // TODO // condition 에따른 플레이어 찾기
         public Player FindPlayer(Func<GameObject, bool> condition)

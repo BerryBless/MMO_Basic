@@ -26,7 +26,7 @@ public class ObjectManager
         GameObjectType type = GetObjectTypeById(info.ObjectId);
         if (type == GameObjectType.Player)
         {
-            // 추가되는게 플에이어 일때
+            // 추가되는게 플레이어 일때
             GameObject go;
             if (myPlayer)
             {
@@ -142,6 +142,14 @@ public class ObjectManager
             Managers.Resource.Destroy(obj);
         _objects.Clear();
         MyPlayer = null;
+    }
+
+    public void LoadMap(int mapId)
+    {
+        // TODO 맵 바뀔때 기존맵 지우고 로딩하기
+        //Managers.Map.DestroyMap();
+
+        Managers.Map.LoadMap(mapId);
     }
 }
 

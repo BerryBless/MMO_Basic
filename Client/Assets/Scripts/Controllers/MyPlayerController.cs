@@ -115,10 +115,21 @@ public class MyPlayerController : PlayerController
         // 스킬이냐?
         if (Input.GetButton("Fire1") && _coSkillCoolTime == null)
         {
-            Debug.Log("SKILL !!");
+            //Debug.Log("SKILL !!");
             // 스킬 패킷보내기
             C_Skill skill = new C_Skill() { Info = new SkillInfo() };
             skill.Info.SkillId = 2; // TEST: 1번은 평타 2번은 화살
+            Managers.Network.Send(skill);
+
+            _coSkillCoolTime = StartCoroutine("SkillCoolTime", 0.3f);
+        }
+        // 스킬이냐?
+        else if (Input.GetButton("Fire2") && _coSkillCoolTime == null)
+        {
+            //Debug.Log("SKILL !!");
+            // 스킬 패킷보내기
+            C_Skill skill = new C_Skill() { Info = new SkillInfo() };
+            skill.Info.SkillId = 1; // TEST: 1번은 평타 2번은 화살
             Managers.Network.Send(skill);
 
             _coSkillCoolTime = StartCoroutine("SkillCoolTime", 0.3f);

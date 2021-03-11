@@ -42,6 +42,7 @@ namespace Server.Game
 
     public class Map
     {
+        public int MapID { get; set; }
 
         public int MinX { get; set; }
         public int MaxX { get; set; }
@@ -54,11 +55,13 @@ namespace Server.Game
         bool[,] _collision;
         GameObject[,] _objects; // 오브젝트 충돌!
 
-        public void LoadMap(int mapId) {
+        public void LoadMap(int mapId)
+        {
             LoadMap(mapId, "../../../../../Common/MapData");
         }
         private void LoadMap(int mapId, string pathPrefix)
         {
+            MapID = mapId;
             string mapName = "Map_" + mapId.ToString("000");
 
             // Collision 관련 파일
@@ -95,11 +98,12 @@ namespace Server.Game
         }
 
         // 좌표이동 그리드 관리
-        public bool ApllyMove(GameObject gameObject, Vector2Int dest) 
+        public bool ApllyMove(GameObject gameObject, Vector2Int dest)
         {
             if (ApllyLeave(gameObject) == false) return false;
 
             if (CanGo(dest, checkObjectes: true) == false) return false;
+            PositionInfo posInfo = gameObject.PosInfo;
 
             {   // 플레이어 이동한곳에 넣기
                 int x = dest.x - MinX;
@@ -108,7 +112,6 @@ namespace Server.Game
             }
 
             // 실제 좌표 이동
-            PositionInfo posInfo = gameObject.PosInfo;
             posInfo.PosX = dest.x;
             posInfo.PosY = dest.y;
 
@@ -119,11 +122,12 @@ namespace Server.Game
         public bool ApllyLeave(GameObject gameObject)
         {
             // 유효성 체크
-            if (gameObject == null) return false;
-            if (gameObject.Room == null) return false;
-            if (gameObject.Room.Map == null) return false;
+            if (gameObject.Room == null) 
+                return false;
+            if (gameObject.Room.Map == null) 
+                return false;
 
-            GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.Id);
+            //GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.Id);
 
             // 올바른 좌표 확인
             PositionInfo posInfo = gameObject.Info.PosInfo;
@@ -137,9 +141,9 @@ namespace Server.Game
             int y = MaxY - posInfo.PosY;
 
             // 최종확인후 삭제
-            if(_objects[y,x] == gameObject)
+            if (_objects[y, x] == gameObject)
                 _objects[y, x] = null;
-            
+
 
             return true;
         }
@@ -238,7 +242,7 @@ namespace Server.Game
 
                     // 유효 범위를 벗어났으면 스킵
                     // 벽으로 막혀서 갈 수 없으면 스킵
-                    if ( next.Y != dest.Y || next.X != dest.X)
+                    if (next.Y != dest.Y || next.X != dest.X)
                     {
                         // 
                         if (CanGo(Pos2Cell(next), checkObjects) == false) // CellPos

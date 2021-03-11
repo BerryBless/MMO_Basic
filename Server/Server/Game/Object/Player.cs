@@ -18,7 +18,6 @@ namespace Server.Game
         public override void OnDamaged(GameObject attecker, int damage)
         {
             base.OnDamaged(attecker, damage);
-            Console.WriteLine($"{this.Info.Name} Damaged from {attecker.Info.Name} : {damage} ");
         }
     }
 }

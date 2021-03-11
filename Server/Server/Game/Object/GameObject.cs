@@ -124,15 +124,16 @@ namespace Server.Game
         // 오브젝트 소멸
         public virtual void OnDead(GameObject attecker)
         {
+            if (this.Room == null) return;
+
             S_Die diePacket = new S_Die();
             diePacket.ObjectId = Id; // 내가 죽음
             diePacket.AttackerId = attecker.Id; // 저놈이 나죽임
 
-            if (Room == null) return;
-            Room.Broadcast(diePacket); // Id가 죽었대!!
+            this.Room.Broadcast(diePacket); // Id가 죽었대!!
 
             // 리스폰
-            GameRoom room = Room;
+            GameRoom room = this.Room;
             room.LeaveGame(Id);
 
             Stat.Hp = Stat.MaxHp;
