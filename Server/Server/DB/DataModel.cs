@@ -9,7 +9,7 @@ namespace Server.DB
     [Table("Player")]
     public class PlayerDb{
         [Key]
-        public int PlayerId { get; set; }
+        public int PlayerDbId { get; set; }
         public string PlayerName { get; set; }
 
         [ForeignKey("Account")]
@@ -29,7 +29,7 @@ namespace Server.DB
     public class AccountDb
     {
         [Key]
-        public int AccountId { get; set; }
+        public int AccountDbId { get; set; }
         public string AccountName { get; set; }
 
         public ICollection<PlayerDb> Players { get; set; }

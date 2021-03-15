@@ -138,14 +138,10 @@ namespace Server.Game
                 Player player;
                 if (_players.Remove(objectId, out player) == false) return;
 
-                bool isApllyLeave = Map.ApllyLeave(player);
+                player.OnLeaveGame();
+                Map.ApllyLeave(player);
                 player.Room = null;
 
-                if(isApllyLeave == false)
-                {
-                    //Console.WriteLine($"isApllyLeave :: {isApllyLeave}");
-                    //isApllyLeave = Map.ApllyLeave(player);
-                }
 
                 // 본인한테 정보 전송
                 {

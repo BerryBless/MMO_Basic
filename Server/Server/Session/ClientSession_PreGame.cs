@@ -36,12 +36,13 @@ namespace Server
 
                 if (findAccount != null)
                 { // 로그인 성공
-                    AccountDbId = findAccount.AccountId;        // Id는 자주쓰니 기억
+                    AccountDbId = findAccount.AccountDbId;        // Id는 자주쓰니 기억
                     S_Login loginOk = new S_Login() { LoginOk = 1 };
                     foreach (PlayerDb playerDb in findAccount.Players)
                     {
                         LobbyPlayerInfo lobbyPlayer = new LobbyPlayerInfo()
                         {
+                            PlayerDbId = playerDb.PlayerDbId,
                             Name = playerDb.PlayerName,
                             StatInfo = new StatInfo()
                             {
@@ -70,9 +71,10 @@ namespace Server
                   // TEMP_ 새계정으로
                     AccountDb newAccount = new AccountDb() { AccountName = loginPacket.UniqueId };
                     db.Accounts.Add(newAccount);
-                    db.SaveChanges();   // TODO : Exception
+                    bool success = db.SaveChangesEx();
+                    if (success == false) return;
 
-                    AccountDbId = newAccount.AccountId;        // Id는 자주쓰니 기억
+                    AccountDbId = newAccount.AccountDbId;        // Id는 자주쓰니 기억
 
                     // 로그인 실패
                     S_Login loginOk = new S_Login() { LoginOk = 1 };
@@ -122,11 +124,13 @@ namespace Server
                     };
 
                     db.Players.Add(newPlayerDb);
-                    db.SaveChanges(); // TODO 예외처리 겹친이름등
+                    bool success = db.SaveChangesEx();
+                    if (success == false) return;
 
                     // 메모리에 추가
                     LobbyPlayerInfo lobbyPlayer = new LobbyPlayerInfo()
                     {
+                        PlayerDbId = newPlayerDb.PlayerDbId,
                         Name = newPlayerDb.PlayerName,
                         StatInfo = new StatInfo()
                         {
@@ -160,6 +164,7 @@ namespace Server
             // 로비에서 캐릭터 선택완료
             MyPlayer = Game.ObjectManager.Instance.Add<Player>();
             {
+                MyPlayer.PlayerDbId = playerInfo.PlayerDbId;
                 MyPlayer.Info.Name = playerInfo.Name;
                 MyPlayer.Info.PosInfo.State = CreatureState.Idle;
                 MyPlayer.Info.PosInfo.MoveDir = MoveDir.Down;
