@@ -25,8 +25,7 @@ namespace Server.Game
         }
         public void OnLeaveGame()
         {
-            if (HP != 0) 
-                 DbTransaction.SavePlayerStatus_AllInOne(this, Room);
+            DbTransaction.SavePlayerStatus_AllInOne(this, Room);
         }
     }
 }
