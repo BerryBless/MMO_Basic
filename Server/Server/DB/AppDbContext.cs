@@ -17,7 +17,7 @@ namespace Server.DB
             builder => { builder.AddConsole(); });
 
 
-        string _connectionString = ConfigManager.Config.connectionString;//@"Data Source=DESKTOP-TF4718J\SQLEXPRESS;Initial Catalog=MMO_GMAE;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        string _connectionString = @"Data Source=192.168.0.104;Initial Catalog=GameDB;User ID=shsuz;Password=0000;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options
