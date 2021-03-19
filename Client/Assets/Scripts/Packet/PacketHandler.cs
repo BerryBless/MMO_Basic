@@ -158,6 +158,15 @@ class PacketHandler
         }
     }
 
+    public static void S_ItemListHandler(PacketSession session, IMessage packet)// 맵바꾸기
+    {
+        S_ItemList itemList = packet as S_ItemList;
+        // TODO 플레이어의 아이템 리스트 받기
+        foreach(ItemInfo item in itemList.Items)
+        {
+            Debug.Log($"{item.TemplateId} :: {item.Count}");
+        }
+    }
     public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
     {
         S_ChangeMap changeMapPacket = packet as S_ChangeMap;
