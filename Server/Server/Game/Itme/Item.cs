@@ -48,6 +48,7 @@ namespace Server.Game
             if (item != null)
             {
                 item.ItemDbId = itemDb.ItemDbId;
+                item.Count = itemDb.Count;
             }
             return item;
         }
