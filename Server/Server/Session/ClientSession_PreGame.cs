@@ -180,17 +180,24 @@ namespace Server
                     List<ItemDb> items = db.Items
                                         .Where(i => i.OwnerDbId == playerInfo.PlayerDbId)
                                         .ToList();
-                    foreach (ItemDb item in items)
+                    foreach (ItemDb itemDb in items)
                     {
-                        // TODO 인벤, 창고에 넣어주기
-                        ItemInfo info = new ItemInfo();
-                        itemListPacket.Items.Add(info);
-                    }
-                    // TODO 클라에게 목록보내기
+                        Item item = Item.MakeItem(itemDb);
+                        if (item != null)
+                        {
+                            // 인벤에 넣어주기
+                            MyPlayer.Inven.Add(item);
 
+                            // 아이템 정보
+                            ItemInfo info = new ItemInfo();
+                            info.MergeFrom(item.info);
+                            itemListPacket.Items.Add(info);
+                        }
+                    }
+                    // 클라에게 아이템 목록보내기
+                    Send(itemListPacket);
                 }
 
-                Send(itemListPacket);
             }
 
             ServerState = PlayerServerState.ServerStateGame;
