@@ -98,7 +98,7 @@ namespace Server
                     .Where(p => p.PlayerName == createPacket.Name)
                     .FirstOrDefault();
 
-                if(findPlayer != null)
+                if (findPlayer != null)
                 {
                     // 겹치니 못만든다는 뜻으로 null 패킷 보냄
                     Send(new S_CreatePlayer());
@@ -146,7 +146,7 @@ namespace Server
                     LobbyPlayers.Add(lobbyPlayer);
 
                     // 성공 전송
-                    S_CreatePlayer newPlayerPacket = new S_CreatePlayer() { Player = new LobbyPlayerInfo()};
+                    S_CreatePlayer newPlayerPacket = new S_CreatePlayer() { Player = new LobbyPlayerInfo() };
                     newPlayerPacket.Player.MergeFrom(lobbyPlayer);
                     Send(newPlayerPacket);
                 }
@@ -158,7 +158,7 @@ namespace Server
         {
             if (ServerState != PlayerServerState.ServerStateLobby) return;
 
-            LobbyPlayerInfo playerInfo =  LobbyPlayers.Find(p => p.Name == enterGamePacket.Name);
+            LobbyPlayerInfo playerInfo = LobbyPlayers.Find(p => p.Name == enterGamePacket.Name);
             if (playerInfo == null) return;
 
             // 로비에서 캐릭터 선택완료
@@ -172,6 +172,25 @@ namespace Server
                 MyPlayer.Info.PosInfo.PosY = 0;
                 MyPlayer.Stat.MergeFrom(playerInfo.StatInfo);
                 MyPlayer.Session = this;
+
+                S_ItemList itemListPacket = new S_ItemList();
+
+                using (AppDbContext db = new AppDbContext())
+                {
+                    List<ItemDb> items = db.Items
+                                        .Where(i => i.OwnerDbId == playerInfo.PlayerDbId)
+                                        .ToList();
+                    foreach (ItemDb item in items)
+                    {
+                        // TODO 인벤, 창고에 넣어주기
+                        ItemInfo info = new ItemInfo();
+                        itemListPacket.Items.Add(info);
+                    }
+                    // TODO 클라에게 목록보내기
+
+                }
+
+                Send(itemListPacket);
             }
 
             ServerState = PlayerServerState.ServerStateGame;
