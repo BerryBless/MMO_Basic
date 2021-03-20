@@ -2,13 +2,13 @@
   "weapons": [
     {
       "id": "1",
-      "name": "견습생의 검",
+      "name": "견습?�의 검",
       "weaponType": "Sword",
       "damage": "10"
     },
     {
       "id": "2",
-      "name": "견습생의 활",
+      "name": "견습?�의 ??,
       "weaponType": "Bow",
       "damage": "5"
     }
@@ -16,13 +16,13 @@
   "armors": [
     {
       "id": "100",
-      "name": "뼈 갑옷",
+      "name": "�?갑옷",
       "armorType": "Armor",
       "defence": "15"
     },
     {
       "id": "101",
-      "name": "뼈 투구",
+      "name": "�??�구",
       "armorType": "Helmet",
       "defence": "5"
     }
