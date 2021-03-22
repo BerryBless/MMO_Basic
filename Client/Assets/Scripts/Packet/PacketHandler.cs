@@ -161,11 +161,23 @@ class PacketHandler
     public static void S_ItemListHandler(PacketSession session, IMessage packet)// 맵바꾸기
     {
         S_ItemList itemList = packet as S_ItemList;
-        // TODO 플레이어의 아이템 리스트 받기
-        foreach(ItemInfo item in itemList.Items)
+
+        UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
+        if (gameSceneUI == null)
+            Debug.Log("gameSceneUI == null");// gameSceneUI가 캐스팅 해도 없으면
+        UI_Inventory invenUI = gameSceneUI.InvenUI;
+
+        // 아이템정보 메모리에 들고있기
+        foreach(ItemInfo itemInfo in itemList.Items)
         {
-            Debug.Log($"{item.TemplateId} :: {item.Count}");
+            Item item = Item.MakeItem(itemInfo);
+            Managers.Inven.Add(item);
         }
+
+        // UI 에서 표시
+        invenUI.gameObject.SetActive(true);
+        invenUI.RefreshUI();
+
     }
     public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
     {
