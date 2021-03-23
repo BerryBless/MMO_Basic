@@ -67,7 +67,7 @@ class PacketHandler
         CreatureController cc = go.GetComponent<CreatureController>();
         if (cc != null)
         {
-            Debug.Log($"skillPacket.Info.SkillId({skillPacket.Info.SkillId})");
+            //Debug.Log($"skillPacket.Info.SkillId({skillPacket.Info.SkillId})");
             cc.UseSkill(skillPacket.Info.SkillId);
         }
 
@@ -162,10 +162,16 @@ class PacketHandler
     {
         S_ItemList itemList = packet as S_ItemList;
 
-        UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
-        if (gameSceneUI == null)
-            Debug.Log("gameSceneUI == null");// gameSceneUI가 캐스팅 해도 없으면
-        UI_Inventory invenUI = gameSceneUI.InvenUI;
+        // 아이템정보 메모리에 들고있기
+        foreach(ItemInfo itemInfo in itemList.Items)
+        {
+            Item item = Item.MakeItem(itemInfo);
+            Managers.Inven.Add(item);
+        }
+    }
+    public static void S_AddItemHandler(PacketSession session, IMessage packet)// 맵바꾸기
+    {
+        S_AddItem itemList = packet as S_AddItem;
 
         // 아이템정보 메모리에 들고있기
         foreach(ItemInfo itemInfo in itemList.Items)
@@ -174,10 +180,7 @@ class PacketHandler
             Managers.Inven.Add(item);
         }
 
-        // UI 에서 표시
-        invenUI.gameObject.SetActive(true);
-        invenUI.RefreshUI();
-
+        Debug.Log("아이템 획득!");
     }
     public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
     {

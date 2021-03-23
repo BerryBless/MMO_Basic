@@ -112,4 +112,40 @@ namespace Server.Data
         }
     }
     #endregion
+
+    #region Monster
+    [Serializable]
+    public class RewardData // 보상데이타
+    {
+        public int probability; // 드랍율 100분율 
+        public int itemId;      // 줄 아이템
+        public int count;       // 갯수
+    }
+
+    [Serializable]
+    public class MonsterData
+    {
+        public int id;          // 몬스터아이디
+        public string name;
+        public StatInfo stat;   //   몬스터 스텟
+        public List<RewardData> rewards; // 드랍아이템
+                                         //public string prefabPath; // 클라
+    }
+
+    [Serializable]
+    public class MonsterLoader : ILoader<int, MonsterData>
+    {
+        public List<MonsterData> monsters = new List<MonsterData>();
+
+        public Dictionary<int, MonsterData> MakeDict()
+        {
+            Dictionary<int, MonsterData> dict = new Dictionary<int, MonsterData>();
+            foreach (MonsterData monster in monsters)
+            {
+                dict.Add(monster.id, monster);
+            }
+            return dict;
+        }
+    }
+    #endregion
 }

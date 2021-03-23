@@ -22,6 +22,7 @@ namespace Server.Game
 
             // TEMP 테스트할몬스터 만들기
             Monster monster = ObjectManager.Instance.Add<Monster>();
+            monster.Init(1);
             monster.CellPos = new Vector2Int(6, 6);
             this.Push(this.EnterGame,monster);
 
@@ -59,11 +60,11 @@ namespace Server.Game
                 _players.Add(gameObject.Id, player);
                 player.Room = this;
 
-                bool isApllyMove = Map.ApllyMove(player, new Vector2Int(player.CellPos.x, player.CellPos.y));
+                bool isApplyMove = Map.ApplyMove(player, new Vector2Int(player.CellPos.x, player.CellPos.y));
 
-                if (isApllyMove == false)
+                if (isApplyMove == false)
                 {
-                    //Console.WriteLine($"isApllyMove :: {isApllyMove}");
+                    //Console.WriteLine($"isApplyMove :: {isApplyMove}");
                     
                 }
                 // 클라이언트에게 Room 에서 처리하고 있는 맵을 로드하라!
@@ -104,7 +105,7 @@ namespace Server.Game
                 _monsters.Add(gameObject.Id, monster);
                 monster.Room = this;
 
-                Map.ApllyMove(monster, new Vector2Int(monster.CellPos.x, monster.CellPos.y));
+                Map.ApplyMove(monster, new Vector2Int(monster.CellPos.x, monster.CellPos.y));
 
             }
             // 오브젝트 타입이 Projectile
@@ -206,7 +207,7 @@ namespace Server.Game
             info.PosInfo.State = movePosInfo.State;
             info.PosInfo.MoveDir = movePosInfo.MoveDir;
             // 플레이어 이동하고 맵에도 처리
-            Map.ApllyMove(player, new Vector2Int(movePosInfo.PosX, movePosInfo.PosY));
+            Map.ApplyMove(player, new Vector2Int(movePosInfo.PosX, movePosInfo.PosY));
 
             // 다른 플레이어 한테도 알려준다
             S_Move resMovePaket = new S_Move();

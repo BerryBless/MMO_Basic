@@ -51,5 +51,9 @@ namespace Server.Game
 
         }
 
+        public override GameObject GetOwner()
+        {
+            return Owner;
+        }
     }
 }

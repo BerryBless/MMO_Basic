@@ -98,7 +98,7 @@ namespace Server.Game
         }
 
         // 좌표이동 그리드 관리
-        public bool ApllyMove(GameObject gameObject, Vector2Int dest)
+        public bool ApplyMove(GameObject gameObject, Vector2Int dest)
         {
             if (ApllyLeave(gameObject) == false) return false;
 

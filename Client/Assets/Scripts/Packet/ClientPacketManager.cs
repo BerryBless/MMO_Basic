@@ -47,6 +47,8 @@ class PacketManager
 		_handler.Add((ushort)MsgId.SCreatePlayer, PacketHandler.S_CreatePlayerHandler);		
 		_onRecv.Add((ushort)MsgId.SItemList, MakePacket<S_ItemList>);
 		_handler.Add((ushort)MsgId.SItemList, PacketHandler.S_ItemListHandler);		
+		_onRecv.Add((ushort)MsgId.SAddItem, MakePacket<S_AddItem>);
+		_handler.Add((ushort)MsgId.SAddItem, PacketHandler.S_AddItemHandler);		
 		_onRecv.Add((ushort)MsgId.SChangeMap, MakePacket<S_ChangeMap>);
 		_handler.Add((ushort)MsgId.SChangeMap, PacketHandler.S_ChangeMapHandler);
 	}

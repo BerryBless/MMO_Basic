@@ -15,6 +15,7 @@ public class MyPlayerController : PlayerController
     // 플레이어 업데이트
     protected override void UpdateController()
     {
+        GetUIKeyInput();
         // State에 따라 적절하게 입력 받기
         switch (State)
         {
@@ -82,6 +83,25 @@ public class MyPlayerController : PlayerController
 
         CheckUpdateFlag();
     }
+
+    // 인벤열기
+    void GetUIKeyInput()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
+            UI_Inventory invenUI = gameSceneUI.InvenUI;
+
+            if (invenUI.gameObject.activeSelf)
+                invenUI.gameObject.SetActive(false);
+            else
+            {
+                invenUI.gameObject.SetActive(true);
+                invenUI.RefreshUI();
+            }
+        }
+    }
+
 
     // 움직일 키입력
     void GetDirInput()
@@ -155,5 +175,5 @@ public class MyPlayerController : PlayerController
         }
     }
 
-   
+
 }

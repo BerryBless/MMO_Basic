@@ -134,8 +134,6 @@ public class PlayerController : CreatureController
         CheckUpdateFlag();
     }
 
-    
-
     public override void OnDamaged()
     {
         //Debug.Log("PlayerHIT!");
