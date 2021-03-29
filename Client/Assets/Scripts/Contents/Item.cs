@@ -12,6 +12,7 @@ public class Item
     public int TemplateId { get { return info.TemplateId; } set { info.TemplateId = value; } }  // 데이터시트 ID
     public int Count { get { return info.Count; } set { info.Count = value; } }                 // 플레이어가 들고있는 이 아이템개수
     public int Slot { get { return info.Slot; } set { info.Slot = value; } }                 // 아이템의 슬롯
+    public bool Equipped { get { return info.Equipped; } set { info.Equipped = value; } }                 // 아이템의 슬롯
 
 
     public ItemType ItemType { get; private set; }  // 아이템타입

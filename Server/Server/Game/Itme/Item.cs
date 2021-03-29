@@ -14,7 +14,8 @@ namespace Server.Game
         public int ItemDbId { get { return info.ItemDbId; } set { info.ItemDbId = value; } }        // Db에서 들고있는 아이템
         public int TemplateId { get { return info.TemplateId; } set { info.TemplateId = value; } }  // 데이터시트 ID
         public int Count { get { return info.Count; } set { info.Count = value; } }                 // 플레이어가 들고있는 이 아이템개수
-        public int Slot { get { return info.Slot; } set { info.Slot = value; } }                 // 플레이어가 들고있는 이 아이템개수
+        public int Slot { get { return info.Slot; } set { info.Slot = value; } }                    // 플레이어가 들고있는 이 아이템개수
+        public bool Equipped { get { return info.Equipped; } set { info.Equipped = value; } }       // 장착된 아이템이냐
 
 
         public ItemType ItemType { get; private set; }  // 아이템타입
@@ -51,6 +52,7 @@ namespace Server.Game
                 item.ItemDbId = itemDb.ItemDbId;
                 item.Count = itemDb.Count;
                 item.Slot = itemDb.Slot;
+                item.Equipped = itemDb.Equipped;
             }
             return item;
         }

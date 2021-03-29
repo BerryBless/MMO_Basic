@@ -60,7 +60,7 @@ class PacketHandler
     public static void S_SkillHandler(PacketSession session, IMessage packet)
     {
         S_Skill skillPacket = packet as S_Skill;
-        
+
         GameObject go = Managers.Object.Find(skillPacket.ObjectId);
         if (go == null) return;
 
@@ -75,7 +75,7 @@ class PacketHandler
     public static void S_ChangeHpHandler(PacketSession session, IMessage packet)
     {
         S_ChangeHp changePacket = packet as S_ChangeHp;
-        
+
         GameObject go = Managers.Object.Find(changePacket.ObjectId);
         if (go == null) return;
 
@@ -89,7 +89,7 @@ class PacketHandler
     public static void S_DieHandler(PacketSession session, IMessage packet)
     {
         S_Die diePacket = packet as S_Die;
-        
+
         GameObject go = Managers.Object.Find(diePacket.ObjectId);
         if (go == null) return;
 
@@ -123,7 +123,7 @@ class PacketHandler
         Debug.Log($"loginOK({loginPacket.LoginOk})");
 
         // TODO : 로비에서 캐릭터 목록 보여주고, 선택
-        if(loginPacket.Players == null || loginPacket.Players.Count == 0)
+        if (loginPacket.Players == null || loginPacket.Players.Count == 0)
         {
             C_CreatePlayer createPacket = new C_CreatePlayer();
             createPacket.Name = $"Player_{Random.Range(0, 10000).ToString("0000")}";
@@ -143,7 +143,7 @@ class PacketHandler
     {
         S_CreatePlayer createOkPacket = packet as S_CreatePlayer;
 
-        if(createOkPacket.Player == null)
+        if (createOkPacket.Player == null)
         {
             // 플레이어 만들기 실패
             C_CreatePlayer createPacket = new C_CreatePlayer();
@@ -158,35 +158,58 @@ class PacketHandler
         }
     }
 
-    public static void S_ItemListHandler(PacketSession session, IMessage packet)// 맵바꾸기
+    public static void S_ItemListHandler(PacketSession session, IMessage packet)// 게임 처음 시작할떄 인벤토리 에 넣기
     {
         S_ItemList itemList = packet as S_ItemList;
 
         // 아이템정보 메모리에 들고있기
-        foreach(ItemInfo itemInfo in itemList.Items)
+        foreach (ItemInfo itemInfo in itemList.Items)
         {
             Item item = Item.MakeItem(itemInfo);
             Managers.Inven.Add(item);
         }
     }
-public static void S_AddItemHandler(PacketSession session, IMessage packet)// 맵바꾸기
-{
-    S_AddItem itemList = packet as S_AddItem;
-
-    // 아이템정보 메모리에 들고있기
-    foreach(ItemInfo itemInfo in itemList.Items)
+    public static void S_AddItemHandler(PacketSession session, IMessage packet)// 인게임중 아이템 획득
     {
-        Item item = Item.MakeItem(itemInfo);
-        Managers.Inven.Add(item);
-    }
+        S_AddItem itemList = packet as S_AddItem;
 
-    Debug.Log("아이템 획득!");
-}
+        // 아이템정보 메모리에 들고있기
+        foreach (ItemInfo itemInfo in itemList.Items)
+        {
+            Item item = Item.MakeItem(itemInfo);
+            Managers.Inven.Add(item);
+        }
+
+        Debug.Log("아이템 획득!");
+        // 인벤토리 새로고침
+        UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
+        UI_Inventory invenUI = gameSceneUI.InvenUI;
+        invenUI.RefreshUI();
+    }
+    public static void S_EquipItemHandler(PacketSession session, IMessage packet)// 아이템 장착 / 탈착 
+    {
+        S_EquipItem equipItemOk = packet as S_EquipItem;
+
+        Item item = Managers.Inven.Get(equipItemOk.ItemDbId);
+        if (item == null)
+            return;
+
+        item.Equipped = equipItemOk.Equipped;
+        Debug.Log("아이템 착용 변경");
+        // 인벤토리 새로고침
+        UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
+        UI_Inventory invenUI = gameSceneUI.InvenUI;
+        invenUI.RefreshUI();
+    }
+    public static void S_ChangeStatHandler(PacketSession session, IMessage packet)// 캐릭터 스텟 바꾸기
+    {
+        S_ChangeStat changeStatPacket = packet as S_ChangeStat;
+    }
     public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
     {
         S_ChangeMap changeMapPacket = packet as S_ChangeMap;
         // TODO 맵바꾸기
         Managers.Map.LoadMap(changeMapPacket.MapId);
     }
-   
+
 }

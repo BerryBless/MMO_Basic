@@ -9,7 +9,7 @@ using Google.Protobuf.Protocol;
 
 namespace Server.DB
 {
-    public class DbTransaction : JobSerializer
+    public partial class DbTransaction : JobSerializer
     {
         public static DbTransaction Instance { get; } = new DbTransaction();
 
@@ -74,8 +74,7 @@ namespace Server.DB
         {
             Console.WriteLine($"Hp Saved({Hp})");
         }
-
-
+        // 보상
         public static void RewardPlayer(Player player, RewardData rewardData, GameRoom room)
         {
             if (player == null || rewardData == null || room == null)
