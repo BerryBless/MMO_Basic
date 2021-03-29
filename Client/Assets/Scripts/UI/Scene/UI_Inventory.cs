@@ -25,6 +25,8 @@ public class UI_Inventory : UI_Base
 
     // UI인벤 새로고침
     public void RefreshUI() {
+        if (Items.Count == 0) return;
+
         List<Item> items = Managers.Inven.Items.Values.ToList();
         items.Sort((l, r) => { return l.Slot - r.Slot; });  // 슬롯 정렬
 
@@ -33,7 +35,7 @@ public class UI_Inventory : UI_Base
             if (item.Slot < 0 || item.Slot >= 20)
                 continue;
 
-            Items[item.Slot].SetItem(item.TemplateId, item.Count);
+            Items[item.Slot].SetItem(item);
         }
     }
 }
