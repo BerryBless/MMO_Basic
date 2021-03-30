@@ -6,10 +6,15 @@ using Google.Protobuf.Protocol;
 public class MyPlayerController : PlayerController
 {
     bool _moveKeyPressed = false;
+
+    public int WeaponDamage { get; private set; }
+    public int ArmorDefence { get; private set; }
+
     // 플레이어 초기화
     protected override void Init()
     {
         base.Init();
+        RefreshAdditionalStat();
     }
 
     // 플레이어 업데이트
@@ -175,5 +180,26 @@ public class MyPlayerController : PlayerController
         }
     }
 
+    // 추가 스텟 계산
+    public void RefreshAdditionalStat()
+    {
+        // 처음부터 계산하는게 속편함
+        WeaponDamage = 0;
+        ArmorDefence = 0;
 
+        foreach (Item item in Managers.Inven.Items.Values)
+        {
+            if (item.Equipped == false) continue;
+
+            switch (item.ItemType)
+            {
+                case ItemType.Weapon:
+                    WeaponDamage += ((Weapon)item).Damage;
+                    break;
+                case ItemType.Armor:
+                    ArmorDefence += ((Armor)item).Defence;
+                    break;
+            }
+        }
+    }
 }

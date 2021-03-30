@@ -25,7 +25,7 @@ public class UI_Inventory_Item : UI_Base
     public int TemplateId { get; private set; }
     public int Count { get; private set; }
     public bool Equipped { get; private set; }
-    
+
 
     public override void Init()
     {
@@ -35,11 +35,22 @@ public class UI_Inventory_Item : UI_Base
         _frame = GetImage((int)Images.Frame);
         _icon = GetImage((int)Images.ItemIcon);
 
+        _frame.gameObject.SetActive(false);
+        //_icon.gameObject.SetActive(false);
+
         // 이벤트핸들러 등록
         _icon.gameObject.BindEvent((e) =>
         {
             // 여기서 아이템 클릭했을때 실행할 코드
             Debug.Log("Click Item");
+
+            // 템플릿ID로 아이템 정보 조회
+            Data.ItemData itemData = null;
+            Managers.Data.ItemDict.TryGetValue(TemplateId, out itemData);
+
+            // TODO 소무품 아이템 사용!
+            if (itemData.itemType == ItemType.Consumable)
+                return;
 
             C_EquipItem equipPacket = new C_EquipItem();
             equipPacket.ItemDbId = ItemDbId;

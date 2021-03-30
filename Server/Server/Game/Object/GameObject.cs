@@ -18,6 +18,10 @@ namespace Server.Game
         public PositionInfo PosInfo { get; private set; } = new PositionInfo();
         public StatInfo Stat { get; private set; } = new StatInfo();
 
+        // 추가 스텟 계산을 위함
+        public virtual int TotalAttack { get { return Stat.Attack; } }
+        public virtual int TotalDefence { get { return 0; } }
+
         public float Speed
         {
             get { return Stat.Speed; }
@@ -108,6 +112,7 @@ namespace Server.Game
         public virtual void OnDamaged(GameObject attecker, int damage)
         {
             // 스텟에서 HP불러와서 damage만큼 깎아주기
+            damage = Math.Max(damage - TotalDefence, 0);
             Stat.Hp = Math.Max(Stat.Hp - damage, 0);
 
             // 깎인체력을 룸안에 브로드캐스팅

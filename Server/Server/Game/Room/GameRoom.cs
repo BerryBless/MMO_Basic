@@ -30,13 +30,9 @@ namespace Server.Game
 
 
         // 누군가 주기적으로 호출해야 겜돌아감
+        // TODO : JobSerializer 에 넣기
         public void Update()
         {
-            foreach (Projectile projectile in _projectile.Values)
-            {
-                projectile.Update();
-            }
-
             foreach (Monster monster in _monsters.Values)
             {
                 monster.Update();
@@ -54,11 +50,12 @@ namespace Server.Game
             if (type == GameObjectType.Player)
             {
                 // 플레이어 룸 스폰
-
                 Player player = gameObject as Player;
                 // 플레이어가 룸안에 들어옴
                 _players.Add(gameObject.Id, player);
                 player.Room = this;
+
+                player.RefreshAdditionalStat();
 
                 bool isApplyMove = Map.ApplyMove(player, new Vector2Int(player.CellPos.x, player.CellPos.y));
 
@@ -115,6 +112,8 @@ namespace Server.Game
                 Projectile projecttile = gameObject as Projectile;
                 _projectile.Add(gameObject.Id, projecttile);
                 projecttile.Room = this;
+                // 업데이트 한번실행
+                projecttile.Update();
             }
 
             // 타인에게 정보 전송

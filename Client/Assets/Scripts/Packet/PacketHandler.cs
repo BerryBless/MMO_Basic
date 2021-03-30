@@ -168,6 +168,8 @@ class PacketHandler
             Item item = Item.MakeItem(itemInfo);
             Managers.Inven.Add(item);
         }
+        if (Managers.Object.MyPlayer != null)
+            Managers.Object.MyPlayer.RefreshAdditionalStat();
     }
     public static void S_AddItemHandler(PacketSession session, IMessage packet)// 인게임중 아이템 획득
     {
@@ -185,6 +187,9 @@ class PacketHandler
         UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
         UI_Inventory invenUI = gameSceneUI.InvenUI;
         invenUI.RefreshUI();
+        // 변경스텟 적용
+        if (Managers.Object.MyPlayer != null)
+            Managers.Object.MyPlayer.RefreshAdditionalStat();
     }
     public static void S_EquipItemHandler(PacketSession session, IMessage packet)// 아이템 장착 / 탈착 
     {
@@ -200,6 +205,9 @@ class PacketHandler
         UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
         UI_Inventory invenUI = gameSceneUI.InvenUI;
         invenUI.RefreshUI();
+        // 변경스텟 적용
+        if (Managers.Object.MyPlayer != null)
+            Managers.Object.MyPlayer.RefreshAdditionalStat();
     }
     public static void S_ChangeStatHandler(PacketSession session, IMessage packet)// 캐릭터 스텟 바꾸기
     {

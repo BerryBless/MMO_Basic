@@ -9,18 +9,12 @@ namespace Server.Game
     {
         public GameObject Owner { get; set; }
 
-        long _nextMoveTick = 0; // 틱카운터
-
         public override void Update() {
             // 유효성 검사
             if (Data == null || Data.projectile == null || Owner == null || Room == null) return;
 
-            if (_nextMoveTick >= Environment.TickCount64) {
-                return;
-            }
-
-            long tick = (long)(1000 / Data.projectile.speed); // 1초에 speed칸만큼 움직임
-            _nextMoveTick = Environment.TickCount64 + tick;
+            int tick = (int)(1000 / Data.projectile.speed); // 1초에 speed칸만큼 움직임
+            Room.PushAfter(tick, Update);// 자기 자신을 예약
 
             // TODO 앞으로 나가기 / 뿌려주기
             Vector2Int destPos = GetFrontCellPos();
@@ -42,13 +36,12 @@ namespace Server.Game
                 {
                     // 피격판정
                     //Console.WriteLine($"{target.Info.Name}  Damaged : {Data.damage}");
-                    target.OnDamaged(this, Data.damage + Owner.Stat.Attack);
+                    target.OnDamaged(this, Data.damage + Owner.TotalAttack);
                 }
                 // 소멸
                 //Room.LeaveGame(Id);
                 Room.Push(Room.LeaveGame, Id);
             }
-
         }
 
         public override GameObject GetOwner()
