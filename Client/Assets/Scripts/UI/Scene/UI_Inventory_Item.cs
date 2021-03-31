@@ -48,6 +48,8 @@ public class UI_Inventory_Item : UI_Base
             Data.ItemData itemData = null;
             Managers.Data.ItemDict.TryGetValue(TemplateId, out itemData);
 
+            if (itemData == null) return;
+
             // TODO 소무품 아이템 사용!
             if (itemData.itemType == ItemType.Consumable)
                 return;
@@ -61,19 +63,34 @@ public class UI_Inventory_Item : UI_Base
     }
     public void SetItem(Item item)
     {
-        // 아이템 데이타 불러와서
-        ItemDbId = item.ItemDbId;
-        TemplateId = item.TemplateId;
-        Count = item.Count;
-        Equipped = item.Equipped;
-        // 템플릿ID로 아이템 정보 조회
-        Data.ItemData itemData = null;
-        Managers.Data.ItemDict.TryGetValue(TemplateId, out itemData);
+        if (item == null)
+        {
+            // 아이템 널이면 빈칸
+            ItemDbId = 0;
+            TemplateId = 0;
+            Count = 0;
+            Equipped = false;
 
-        // 아이콘 이미지 저장하기
-        _icon.sprite = Managers.Resource.Load<Sprite>(itemData.iconPath);
+            _icon.gameObject.SetActive(false);
+            _frame.gameObject.SetActive(false);
+        }
+        else
+        {
+            // 아이템 데이타 불러와서
+            ItemDbId = item.ItemDbId;
+            TemplateId = item.TemplateId;
+            Count = item.Count;
+            Equipped = item.Equipped;
+            // 템플릿ID로 아이템 정보 조회
+            Data.ItemData itemData = null;
+            Managers.Data.ItemDict.TryGetValue(TemplateId, out itemData);
 
-        // 착용상테 프레임으로 표시
-        _frame.gameObject.SetActive(Equipped);
+            // 아이콘 이미지 저장하기
+            _icon.sprite = Managers.Resource.Load<Sprite>(itemData.iconPath);
+
+            // 착용상테 프레임으로 표시
+            _icon.gameObject.SetActive(true);
+            _frame.gameObject.SetActive(Equipped);
+        }
     }
 }

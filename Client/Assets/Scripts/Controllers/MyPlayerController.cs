@@ -104,6 +104,18 @@ public class MyPlayerController : PlayerController
                 invenUI.gameObject.SetActive(true);
                 invenUI.RefreshUI();
             }
+        }else if (Input.GetKeyDown(KeyCode.C))
+        {
+            UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
+            UI_Stat statUI= gameSceneUI.StatUI;
+
+            if (statUI.gameObject.activeSelf)
+                statUI.gameObject.SetActive(false);
+            else
+            {
+                statUI.gameObject.SetActive(true);
+                statUI.RefreshUI();
+            }
         }
     }
 

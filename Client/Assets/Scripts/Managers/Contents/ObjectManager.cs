@@ -37,7 +37,7 @@ public class ObjectManager
                 MyPlayer = go.GetComponent<MyPlayerController>();
                 MyPlayer.Id = info.ObjectId;
                 MyPlayer.PosInfo = info.PosInfo;
-                MyPlayer.Stat = info.StatInfo;
+                MyPlayer.Stat.MergeFrom(info.StatInfo);
                 
                 MyPlayer.SynkPos();
             }
@@ -50,7 +50,7 @@ public class ObjectManager
                 PlayerController pc = go.GetComponent<PlayerController>();
                 pc.Id = info.ObjectId;
                 pc.PosInfo = info.PosInfo;
-                pc.Stat = info.StatInfo;
+                pc.MergeFrom(info.StatInfo);
 
                 pc.SynkPos();
             }
