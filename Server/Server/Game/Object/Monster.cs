@@ -29,6 +29,7 @@ namespace Server.Game
         }
 
         // 고정 상태 기계 AI
+        IJob _job;
         public override void Update()
         {
             switch (State)
@@ -46,6 +47,10 @@ namespace Server.Game
                     UpdateDead();
                     break;
             }
+
+            // 5프레임 (0.2초마다 한번씩 Update)
+            if (Room != null)
+                _job = Room.PushAfter(200, Update);
         }
 
         Player _target;
@@ -193,6 +198,11 @@ namespace Server.Game
 
         public override void OnDead(GameObject attacker)
         {
+            if (_job != null)
+            {
+                _job.Cancel = true;
+                _job = null;
+            }
             base.OnDead(attacker);
 
             GameObject owner = attacker.GetOwner(); // 막타친거가 플레이어가 아닐 수 도 있음 (여기선 투사체)
@@ -205,6 +215,7 @@ namespace Server.Game
                     DbTransaction.RewardPlayer(player, rewardData, Room);
                 }
             }
+
         }
 
         RewardData GetRandomReward()

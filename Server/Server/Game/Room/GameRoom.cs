@@ -33,11 +33,6 @@ namespace Server.Game
         // TODO : JobSerializer 에 넣기
         public void Update()
         {
-            foreach (Monster monster in _monsters.Values)
-            {
-                monster.Update();
-            }
-
             Flush();
         }
         // 오브젝트 룸에서 생성해욧
@@ -97,18 +92,19 @@ namespace Server.Game
             // 오브젝트 타입이 Monster
             else if (type == GameObjectType.Monster)
             {
-                // TODO 몬스터 룸 스폰
+                // 몬스터 룸 스폰
                 Monster monster = gameObject as Monster;
                 _monsters.Add(gameObject.Id, monster);
                 monster.Room = this;
 
                 Map.ApplyMove(monster, new Vector2Int(monster.CellPos.x, monster.CellPos.y));
-
+                // 업데이트 한번실행
+                monster.Update();
             }
             // 오브젝트 타입이 Projectile
             else if (type == GameObjectType.Projectile)
             {
-                // TODO 투사체 룸 스폰
+                // 투사체 룸 스폰
                 Projectile projecttile = gameObject as Projectile;
                 _projectile.Add(gameObject.Id, projecttile);
                 projecttile.Room = this;
@@ -203,7 +199,7 @@ namespace Server.Game
         }
 
 
-        // TODO // condition 에따른 플레이어 찾기
+        // condition 에따른 플레이어 찾기
         public Player FindPlayer(Func<GameObject, bool> condition)
         {
             foreach (Player p in _players.Values)
