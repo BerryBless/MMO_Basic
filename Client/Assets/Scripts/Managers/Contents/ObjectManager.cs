@@ -50,7 +50,7 @@ public class ObjectManager
                 PlayerController pc = go.GetComponent<PlayerController>();
                 pc.Id = info.ObjectId;
                 pc.PosInfo = info.PosInfo;
-                pc.MergeFrom(info.StatInfo);
+                pc.Stat.MergeFrom(info.StatInfo);
 
                 pc.SynkPos();
             }

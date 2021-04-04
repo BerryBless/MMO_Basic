@@ -202,9 +202,12 @@ namespace Server
 
             ServerState = PlayerServerState.ServerStateGame;
             // TODO 룸번호 바꾸기
-            //RoomManager.Instance.Find(1).EnterGame(MyPlayer);
-            GameRoom room = RoomManager.Instance.Find(1);
-            room.Push(room.EnterGame, MyPlayer);
+            GameLogic.Instance.Push(() =>
+            {
+                GameRoom room = GameLogic.Instance.Find(1);
+                room.Push(room.EnterGame, MyPlayer);
+            });
+
         }
     }
 }

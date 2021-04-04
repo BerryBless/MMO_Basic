@@ -20,17 +20,39 @@ namespace Server
     class Program
     {
         static Listener _listener = new Listener();
-        static List<System.Timers.Timer> _timers = new List<System.Timers.Timer>();
 
-        static void TickRoom(GameRoom room, int tick = 100)
+        static void GameLogicTask()
         {
-            var timer = new System.Timers.Timer();
-            timer.Interval = tick;
-            timer.Elapsed += ((s, e) => { room.Update(); });
-            timer.AutoReset = true;
-            timer.Enabled = true;
+            while (true)
+            {
+                GameLogic.Instance.Update();
+                Thread.Sleep(0);
+            }
+        }
 
-            _timers.Add(timer);
+        static void DbTask()
+        {
+            while (true)
+            {
+                DbTransaction.Instance.Flush();
+                Thread.Sleep(0);
+            }
+        }
+
+
+        static void NetworkTask()
+        {
+            while (true)
+            {
+                // 모든 플레이어를 순회
+                List<ClientSession> sessions = SessionManager.Instance.GetSessions();
+                foreach (ClientSession session in sessions)
+                {
+                    // Flush
+                    session.FlushSend();
+                }
+                Thread.Sleep(0);
+            }
         }
 
         static void Main(string[] args)
@@ -40,9 +62,10 @@ namespace Server
             DataManager.LoadData();
 
             // 룸 생성
-            int mapId = 1;
-            GameRoom room = RoomManager.Instance.Add(mapId); // TEMP 1은 맵ID
-            TickRoom(room, 50);
+            GameLogic.Instance.Push(() =>
+            {
+                GameLogic.Instance.Add(1);
+            });
 
             // DNS (Domain Name System)
             string host = Dns.GetHostName();
@@ -53,10 +76,20 @@ namespace Server
             _listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });
             Console.WriteLine("Listening...");
 
-            while (true)
+            // GameLogicTask
             {
-                DbTransaction.Instance.Flush();
+                Task gameLogicTask = new Task(GameLogicTask, TaskCreationOptions.LongRunning);
+                gameLogicTask.Start();
             }
+            // NetworkTask
+            {
+                Task networkTask = new Task(NetworkTask, TaskCreationOptions.LongRunning);
+                networkTask.Start();
+            }
+
+            // DbTask
+            DbTask();
+
         }
     }
 }
