@@ -76,20 +76,30 @@ namespace Server
             _listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });
             Console.WriteLine("Listening...");
 
-            // GameLogicTask
-            {
-                Task gameLogicTask = new Task(GameLogicTask, TaskCreationOptions.LongRunning);
-                gameLogicTask.Start();
-            }
             // NetworkTask
             {
-                Task networkTask = new Task(NetworkTask, TaskCreationOptions.LongRunning);
-                networkTask.Start();
+                //Task networkTask = new Task(NetworkTask, TaskCreationOptions.LongRunning);
+                //networkTask.Start();
+                Thread t = new Thread(NetworkTask);
+                t.Name = "Network Send";
+                t.Start();
             }
 
             // DbTask
-            DbTask();
-
+            {
+                //Task dbTask = new Task(DbTask, TaskCreationOptions.LongRunning);
+                //dbTask.Start();
+                Thread t = new Thread(DbTask);
+                t.Name = "DB";
+                t.Start();
+            }
+            // GameLogicTask
+            {
+                //Task gameLogicTask = new Task(GameLogicTask, TaskCreationOptions.LongRunning);
+                //gameLogicTask.Start();
+                Thread.CurrentThread.Name = "GameLogic";
+                GameLogicTask();
+            }
         }
     }
 }
