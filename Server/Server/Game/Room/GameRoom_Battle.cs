@@ -43,7 +43,7 @@ namespace Server.Game
             resMovePaket.ObjectId = player.Info.ObjectId;
             resMovePaket.PosInfo = movePacket.PosInfo;
 
-            Broadcast(resMovePaket);
+            Broadcast(player.CellPos, resMovePaket);
 
         }
         // C_Skill
@@ -63,7 +63,7 @@ namespace Server.Game
             S_Skill skill = new S_Skill() { Info = new SkillInfo() };
             skill.ObjectId = info.ObjectId;
             skill.Info.SkillId = skillPacket.Info.SkillId; // 유저가 보내준 스킬
-            Broadcast(skill);
+            Broadcast(player.CellPos,skill);
 
             Data.Skill skillData = null;
             if (DataManager.SkillDict.TryGetValue(skill.Info.SkillId, out skillData) == false) return;
