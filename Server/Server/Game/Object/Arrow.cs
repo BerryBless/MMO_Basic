@@ -9,7 +9,8 @@ namespace Server.Game
     {
         public GameObject Owner { get; set; }
 
-        public override void Update() {
+        public override void Update()
+        {
             // 유효성 검사
             if (Data == null || Data.projectile == null || Owner == null || Room == null) return;
 
@@ -18,10 +19,8 @@ namespace Server.Game
 
             // TODO 앞으로 나가기 / 뿌려주기
             Vector2Int destPos = GetFrontCellPos();
-            if (Room.Map.CanGo(destPos) == true)
+            if (Room.Map.ApplyMove(this, destPos, collision: false) == true)
             {
-                CellPos = destPos;
-
                 S_Move movePacket = new S_Move();
                 movePacket.ObjectId = Id;
                 movePacket.PosInfo = PosInfo;

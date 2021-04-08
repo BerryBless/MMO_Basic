@@ -29,7 +29,14 @@ namespace Server.Game
         public override void OnDamaged(GameObject attecker, int damage)
         {
             base.OnDamaged(attecker, damage);
+            Console.WriteLine($"player OnDamaged : {attecker.Id}");
         }
+        public override void OnDead(GameObject attecker)
+        {
+            base.OnDead(attecker);
+            Vision.Clear();
+        }
+
         public void OnLeaveGame()
         {
             DbTransaction.SavePlayerStatus_AllInOne(this, Room);

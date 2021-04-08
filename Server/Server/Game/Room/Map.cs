@@ -123,17 +123,32 @@ namespace Server.Game
         }
 
         // 좌표이동 그리드 관리
-        public bool ApplyMove(GameObject gameObject, Vector2Int dest)
+        public bool ApplyMove(GameObject gameObject, Vector2Int dest, bool checkObjects = true, bool collision = true)
         {
-            if (ApllyLeave(gameObject) == false) return false;
+            if (gameObject.Room == null) return false;
+            if (gameObject.Room.Map != this) return false;
 
-            if (CanGo(dest, checkObjectes: true) == false) return false;
+
             PositionInfo posInfo = gameObject.PosInfo;
+            if (CanGo(dest, checkObjectes: true) == false) return false;
 
-            {   // 플레이어 이동한곳에 넣기
-                int x = dest.x - MinX;
-                int y = MaxY - dest.y;
-                _objects[y, x] = gameObject;
+            if (collision)
+            {
+                { 
+                    // 좌표 찍어 주기
+                    int x = posInfo.PosX - MinX;
+                    int y = MaxY - posInfo.PosY;
+
+                    // 최종확인후 삭제
+                    if (_objects[y, x] == gameObject)
+                        _objects[y, x] = null;
+                }
+                {
+                    // 플레이어 이동한곳에 넣기
+                    int x = dest.x - MinX;
+                    int y = MaxY - dest.y;
+                    _objects[y, x] = gameObject;
+                }
             }
 
             // Zone
@@ -195,7 +210,7 @@ namespace Server.Game
         }
 
         // 대상이 사라졌다!
-        public bool ApllyLeave(GameObject gameObject)
+        public bool ApplyLeave(GameObject gameObject)
         {
             // 유효성 체크
             if (gameObject.Room == null)
@@ -203,7 +218,6 @@ namespace Server.Game
             if (gameObject.Room.Map == null)
                 return false;
 
-            //GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.Id);
 
             // 올바른 좌표 확인
             PositionInfo posInfo = gameObject.Info.PosInfo;
@@ -212,8 +226,9 @@ namespace Server.Game
             if (posInfo.PosY < MinY || posInfo.PosY > MaxY)
                 return false;
 
-
-
+            // Zone
+            Zone zone = gameObject.Room.GetZone(gameObject.CellPos);
+            zone.Remove(gameObject);
 
 
             // 좌표 찍어 주기

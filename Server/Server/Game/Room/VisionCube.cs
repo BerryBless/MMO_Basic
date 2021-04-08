@@ -17,6 +17,10 @@ namespace Server.Game
         {
             Owner = owner;
         }
+        public void Clear()
+        {
+            PreviousObjects = new HashSet<GameObject>();
+        }
 
         // 호출된 시점의 시야각 내 오브젝트 불러오기
         public HashSet<GameObject> GatherObjects()
@@ -126,8 +130,8 @@ namespace Server.Game
             // 갱신
             PreviousObjects = currentObjects;
 
-            // 0.5초뒤에 다시 호출
-            Owner.Room.PushAfter(500, Update);
+            // 0.1초뒤에 다시 호출
+            Owner.Room.PushAfter(100, Update);
         }
 
     }

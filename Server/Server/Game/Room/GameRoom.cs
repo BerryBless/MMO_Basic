@@ -15,7 +15,7 @@ namespace Server.Game
 
         Dictionary<int, Player> _players = new Dictionary<int, Player>();               // This.room 안의 플레이어
         Dictionary<int, Monster> _monsters = new Dictionary<int, Monster>();            // This.room 안의 몬스터
-        Dictionary<int, Projectile> _projectile = new Dictionary<int, Projectile>();    // This.room 안의 투사체
+        Dictionary<int, Projectile> _projectiles = new Dictionary<int, Projectile>();    // This.room 안의 투사체
 
         public Zone[,] Zones { get; private set; }
         public int ZoneCells { get; private set; }
@@ -59,8 +59,7 @@ namespace Server.Game
             // TEMP 테스트할몬스터 만들기
             Monster monster = ObjectManager.Instance.Add<Monster>();
             monster.Init(1);
-            monster.CellPos = new Vector2Int(6, 6);
-            this.Push(this.EnterGame, monster);
+            this.Push(this.EnterGame, monster, true);
 
         }
 
@@ -71,10 +70,28 @@ namespace Server.Game
             Flush();
         }
         // 오브젝트 룸에서 생성해욧
-        public void EnterGame(GameObject gameObject)
+        public void EnterGame(GameObject gameObject, bool randomPos = true)
         {
             if (gameObject == null) return;
             GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.Id);
+
+            if (randomPos)
+            {
+                Random _rand = new Random();
+                Vector2Int respawnPos;
+                while (true)
+                {
+                    respawnPos.x = _rand.Next(Map.MinX, Map.MaxX + 1);
+                    respawnPos.y = _rand.Next(Map.MinY, Map.MaxY + 1);
+
+                    if (Map.Find(respawnPos) == null)
+                    {
+                        gameObject.CellPos = respawnPos;
+
+                        break;
+                    }
+                }
+            }
 
             // 오브젝트 타입이 Player일때
             if (type == GameObjectType.Player)
@@ -87,15 +104,9 @@ namespace Server.Game
 
                 player.RefreshAdditionalStat();
 
-                bool isApplyMove = Map.ApplyMove(player, new Vector2Int(player.CellPos.x, player.CellPos.y));
-
+                Map.ApplyMove(player, new Vector2Int(player.CellPos.x, player.CellPos.y));
                 GetZone(player.CellPos).Players.Add(player);
 
-                if (isApplyMove == false)
-                {
-                    //Console.WriteLine($"isApplyMove :: {isApplyMove}");
-
-                }
                 // 클라이언트에게 Room 에서 처리하고 있는 맵을 로드하라!
                 {
                     S_ChangeMap changeMapPacket = new S_ChangeMap();
@@ -111,7 +122,6 @@ namespace Server.Game
 
                     player.Vision.Update();
                 }
-
             }
             // 오브젝트 타입이 Monster
             else if (type == GameObjectType.Monster)
@@ -131,11 +141,17 @@ namespace Server.Game
             {
                 // 투사체 룸 스폰
                 Projectile projectile = gameObject as Projectile;
-                _projectile.Add(gameObject.Id, projectile);
+                _projectiles.Add(gameObject.Id, projectile);
                 projectile.Room = this;
                 GetZone(projectile.CellPos).Projectiles.Add(projectile);
                 // 업데이트 한번실행
                 projectile.Update();
+            }
+            // 타인에게 정보 전송
+            {
+                S_Spawn spawnPacket = new S_Spawn();
+                spawnPacket.Objects.Add(gameObject.Info);
+                Broadcast(gameObject.CellPos, spawnPacket);
             }
         }
         // Id에 따른 오브젝트 룸에서 지워욧
@@ -143,17 +159,19 @@ namespace Server.Game
         {
             GameObjectType type = ObjectManager.GetObjectTypeById(objectId);
 
+            Vector2Int cellPos;
+
             if (type == GameObjectType.Player)
             {
+                Player player = null;
+                if (_players.Remove(objectId, out player) == false)
+                    return;
 
-                Player player;
-                if (_players.Remove(objectId, out player) == false) return;
-                GetZone(player.CellPos).Players.Remove(player);
+                cellPos = player.CellPos;
 
                 player.OnLeaveGame();
-                Map.ApllyLeave(player);
+                Map.ApplyLeave(player);
                 player.Room = null;
-
 
                 // 본인한테 정보 전송
                 {
@@ -163,22 +181,34 @@ namespace Server.Game
             }
             else if (type == GameObjectType.Monster)
             {
-                // 몬스터 룸에서 삭제
-                Monster monster;
-                if (_monsters.Remove(objectId, out monster) == false) return;
-                GetZone(monster.CellPos).Monsters.Remove(monster);
+                Monster monster = null;
+                if (_monsters.Remove(objectId, out monster) == false)
+                    return;
 
-                Map.ApllyLeave(monster);
+                cellPos = monster.CellPos;
+                Map.ApplyLeave(monster);
                 monster.Room = null;
             }
             else if (type == GameObjectType.Projectile)
             {
-                // 투사체 룸에서 삭제
-                Projectile projectile;
-                if (_projectile.Remove(objectId, out projectile) == false) return;
-                GetZone(projectile.CellPos).Projectiles.Remove(projectile);
+                Projectile projectile = null;
+                if (_projectiles.Remove(objectId, out projectile) == false)
+                    return;
 
+                cellPos = projectile.CellPos;
+                Map.ApplyLeave(projectile);
                 projectile.Room = null;
+            }
+            else
+            {
+                return;
+            }
+
+            // 타인한테 정보 전송
+            {
+                S_Despawn despawnPacket = new S_Despawn();
+                despawnPacket.ObjectIds.Add(objectId);
+                Broadcast(cellPos, despawnPacket);
             }
         }
 
@@ -199,7 +229,7 @@ namespace Server.Game
                 arrow.PosInfo.MoveDir = owner.PosInfo.MoveDir;
                 arrow.Speed = skillData.projectile.speed;       // 화살정보 입력
                                                                 // 화살 입갤
-                this.Push(this.EnterGame, arrow);//EnterGame(arrow);
+                this.Push(this.EnterGame, arrow, false);//EnterGame(arrow);
             }
             // else if (skillData.projectile.name == "FireBall") {} // TODO 다른 투사체
         }

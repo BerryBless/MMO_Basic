@@ -25,6 +25,8 @@ public class ObjectManager
     {
         //  zone때문에 myPlayer와 player 패킷이 겹치게 들어옴
         if (MyPlayer != null && MyPlayer.Id == info.ObjectId) return;
+        // 중복으로 생성하는걸 방지
+        if (_objects.ContainsKey(info.ObjectId)) return;
 
         GameObjectType type = GetObjectTypeById(info.ObjectId);
         if (type == GameObjectType.Player)
@@ -41,7 +43,7 @@ public class ObjectManager
                 MyPlayer.Id = info.ObjectId;
                 MyPlayer.PosInfo = info.PosInfo;
                 MyPlayer.Stat.MergeFrom(info.StatInfo);
-                
+
                 MyPlayer.SynkPos();
             }
             else
@@ -75,13 +77,12 @@ public class ObjectManager
         }
         else if (type == GameObjectType.Projectile)
         {
-            // TODO 투사체 ADD
+            // 투사체 ADD
             GameObject go;
             go = Managers.Resource.Instantiate("Creatures/Arrow");
             go.name = info.Name;
             _objects.Add(info.ObjectId, go);
 
-            //TODO 화살 발싸!
             ArrowController ac = go.GetComponent<ArrowController>();
             ac.PosInfo = info.PosInfo;
             ac.Stat = info.StatInfo;
@@ -95,10 +96,11 @@ public class ObjectManager
     {
         //  zone때문에 myPlayer와 player 패킷이 겹치게 들어옴
         if (MyPlayer != null && MyPlayer.Id == id) return;
+        // 중복으로 지우는걸 방지
+        if (_objects.ContainsKey(id) == false) return;
 
         GameObject go = Find(id);
         if (go == null) return;
-
 
         _objects.Remove(id);
         Managers.Resource.Destroy(go);
