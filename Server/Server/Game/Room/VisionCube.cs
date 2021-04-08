@@ -110,7 +110,7 @@ namespace Server.Game
             List<GameObject> removed = PreviousObjects.Except(currentObjects).ToList();
 
             // 사라진 것 이 있다면
-            if (added.Count > 0)
+            if (removed.Count > 0)
             {
                 // Despawn
                 S_Despawn despawnPacket = new S_Despawn();
