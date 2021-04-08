@@ -12,6 +12,7 @@ namespace Server.Game
         public int PlayerDbId { get; set; }
         public ClientSession Session { get; set; }
         public Inventory Inven { get; set; } = new Inventory();
+        public VisionCube Vision { get; private set; } 
 
         public int WeaponDamage { get; private set; }
         public int ArmorDefence { get; private set; }
@@ -22,7 +23,7 @@ namespace Server.Game
         public Player()
         {
             ObjectType = GameObjectType.Player;
-            Speed = 30f; //TODO 데이터 시트로 바꾸기
+            Vision = new VisionCube(this);
         }
 
         public override void OnDamaged(GameObject attecker, int damage)

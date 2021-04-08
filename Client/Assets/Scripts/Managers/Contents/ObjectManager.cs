@@ -23,6 +23,9 @@ public class ObjectManager
 
     public void Add(ObjectInfo info, bool myPlayer = false)
     {
+        //  zone때문에 myPlayer와 player 패킷이 겹치게 들어옴
+        if (MyPlayer != null && MyPlayer.Id == info.ObjectId) return;
+
         GameObjectType type = GetObjectTypeById(info.ObjectId);
         if (type == GameObjectType.Player)
         {
@@ -90,6 +93,9 @@ public class ObjectManager
     }
     public void Remove(int id)
     {
+        //  zone때문에 myPlayer와 player 패킷이 겹치게 들어옴
+        if (MyPlayer != null && MyPlayer.Id == id) return;
+
         GameObject go = Find(id);
         if (go == null) return;
 

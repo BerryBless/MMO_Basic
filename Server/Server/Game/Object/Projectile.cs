@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Server.Game
 {
-    class Projectile : GameObject
+    public class Projectile : GameObject
     {
         // 누구에게 낳음 당했는 가
         public Data.Skill Data { get; set; }
