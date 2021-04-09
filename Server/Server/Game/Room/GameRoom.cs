@@ -57,10 +57,11 @@ namespace Server.Game
             }
 
             // TEMP 테스트할몬스터 만들기
-            Monster monster = ObjectManager.Instance.Add<Monster>();
-            monster.Init(1);
-            this.Push(this.EnterGame, monster, true);
-
+            for(int i=0;i<80;i++){
+                Monster monster = ObjectManager.Instance.Add<Monster>();
+                monster.Init(1);
+                this.Push(this.EnterGame, monster, true);
+            }
         }
 
         // 누군가 주기적으로 호출해야 겜돌아감

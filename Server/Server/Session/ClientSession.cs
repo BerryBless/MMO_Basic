@@ -81,6 +81,8 @@ namespace Server
             //RoomManager.Instance.Find(1).LeaveGame(MyPlayer.Info.ObjectId);
             GameLogic.Instance.Push(() =>
             {
+                if (MyPlayer == null) return;
+
                 GameRoom room = GameLogic.Instance.Find(1);
                 room.Push(room.LeaveGame, MyPlayer.Info.ObjectId);
             });

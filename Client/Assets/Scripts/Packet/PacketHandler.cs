@@ -109,7 +109,10 @@ class PacketHandler
 
         Debug.Log("S_ConnectedHandler");
         C_Login loginPacket = new C_Login();
-        loginPacket.UniqueId = SystemInfo.deviceUniqueIdentifier;
+
+        // 클라이언트 겹치지 않는 아이디를 만들려고
+        string path = Application.dataPath;
+        loginPacket.UniqueId = path.GetHashCode().ToString();
 
         Managers.Network.Send(loginPacket);
 

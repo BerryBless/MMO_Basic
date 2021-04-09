@@ -19,7 +19,7 @@ namespace Server.Game
         }
         public void Clear()
         {
-            PreviousObjects = new HashSet<GameObject>();
+            PreviousObjects.Clear();
         }
 
         // 호출된 시점의 시야각 내 오브젝트 불러오기

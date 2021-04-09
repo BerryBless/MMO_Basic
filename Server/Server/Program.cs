@@ -64,7 +64,7 @@ namespace Server
             // 룸 생성
             GameLogic.Instance.Push(() =>
             {
-                GameLogic.Instance.Add(3);
+                GameLogic.Instance.Add(1);
             });
 
             // DNS (Domain Name System)

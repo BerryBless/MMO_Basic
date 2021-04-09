@@ -134,7 +134,7 @@ namespace Server.Game
 
             if (collision)
             {
-                { 
+                {
                     // 좌표 찍어 주기
                     int x = posInfo.PosX - MinX;
                     int y = MaxY - posInfo.PosY;
@@ -281,7 +281,7 @@ namespace Server.Game
         int[] _deltaX = new int[] { 0, 0, -1, 1 };
         int[] _cost = new int[] { 10, 10, 10, 10 };
 
-        public List<Vector2Int> FindPath(Vector2Int startCellPos, Vector2Int destCellPos, bool checkObjects = false)
+        public List<Vector2Int> FindPath(Vector2Int startCellPos, Vector2Int destCellPos, bool checkObjects = false, int maxDist = 10)
         {
             List<Pos> path = new List<Pos>();
 
@@ -335,6 +335,10 @@ namespace Server.Game
                 {
                     Pos next = new Pos(node.Y + _deltaY[i], node.X + _deltaX[i]);
 
+                    // 너무 멀면 스킵
+                    if (Math.Abs(pos.Y - next.Y) + Math.Abs(pos.X - next.X) > maxDist) continue;
+
+
                     // 유효 범위를 벗어났으면 스킵
                     // 벽으로 막혀서 갈 수 없으면 스킵
                     if (next.Y != dest.Y || next.X != dest.X)
@@ -378,16 +382,39 @@ namespace Server.Game
         {
             List<Vector2Int> cells = new List<Vector2Int>();
 
-            Pos pos = dest;
-
-            while (parent[pos] != pos)
+            // 목적지에 도달 못한것도 처리
+            if (parent.ContainsKey(dest) == false)
             {
-                cells.Add(Pos2Cell(pos));
-                pos = parent[pos];
-            }
-            cells.Add(Pos2Cell(pos));
-            cells.Reverse();
+                // 목적지에 가장 이상적인 곳으로
+                Pos best = new Pos();
+                int bestDist = Int32.MaxValue;
 
+                foreach (Pos pos in parent.Keys)
+                {
+                    int dist = Math.Abs(pos.Y - dest.Y) + Math.Abs(pos.X - dest.X);
+                    // 제일 좋은 목적지
+                    if (dist < bestDist)
+                    {
+                        best = pos;
+                        bestDist = dist;
+
+                    }
+                }
+                // 가장 가까운곳이 목적지
+                dest = best;
+            }
+            // 목적지 찾음
+            {
+                Pos pos = dest;
+
+                while (parent[pos] != pos)
+                {
+                    cells.Add(Pos2Cell(pos));
+                    pos = parent[pos];
+                }
+                cells.Add(Pos2Cell(pos));
+                cells.Reverse();
+            }
             return cells;
         }
 
