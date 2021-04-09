@@ -95,5 +95,10 @@ class PacketHandler
 
         Console.WriteLine($"equipItem ({equipItemPacket.ItemDbId})");
     }
+    public static void C_PongHandler(PacketSession session, IMessage packet)
+    {
+        ClientSession clientSession = session as ClientSession;
+        clientSession.HandlePong();
+    }
 
 }

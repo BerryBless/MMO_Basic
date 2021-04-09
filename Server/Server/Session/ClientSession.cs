@@ -24,6 +24,35 @@ namespace Server
         object _lock = new object();
 
         #region NETWORK
+        // 클라랑 연결중인지
+        long _pingpongTick = 0;
+        public void Ping()
+        {
+            if (_pingpongTick > 0)
+            {
+                long delta = (System.Environment.TickCount64 - _pingpongTick);
+
+                // 30초 동안 응답이 없으면
+                if (delta > 30 * 1000)
+                {
+                    Console.WriteLine("Disconnected by PingCheck");
+
+                    Disconnect();
+                    return;
+                }
+            }
+
+            S_Ping pingPacket = new S_Ping();
+            Send(pingPacket);
+
+            GameLogic.Instance.PushAfter(5000, Ping);
+        }
+        public void HandlePong()
+        {
+            // 갱신
+            _pingpongTick = System.Environment.TickCount64;
+        }
+
         public void Send(IMessage packet)
         {
             // 패킷 이름을 이용해서 ID를 정함
@@ -42,7 +71,7 @@ namespace Server
                 // 예약만하고 보내지는 않음
                 _reserveQueue.Add(sendBuffer);
             }
-                //Send(new ArraySegment<byte>(sendBuffer));
+            //Send(new ArraySegment<byte>(sendBuffer));
         }
 
         // 실제 보내는 부분
@@ -68,6 +97,8 @@ namespace Server
                 S_Connected connectedPacket = new S_Connected();
                 Send(connectedPacket);
             }
+
+            GameLogic.Instance.PushAfter(5000, Ping);
         }
 
         public override void OnRecvPacket(ArraySegment<byte> buffer)

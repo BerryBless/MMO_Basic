@@ -26,7 +26,9 @@ enum MsgId {
   C_EQUIP_ITEM = 18;
   S_EQUIP_ITEM = 19;
   S_CHANGE_STAT = 20;
-  S_CHANGE_MAP = 21;
+  S_PING = 21;
+  C_PONG = 22;
+  S_CHANGE_MAP = 23;
 }
 
 enum CreatureState {
@@ -174,6 +176,9 @@ message S_EquipItem{
 message S_ChangeStat{
   StatInfo statInfo = 1;
 }
+
+message S_Ping{}
+message C_Pong{}
 
 message S_ChangeMap {
   int32 mapId = 1;

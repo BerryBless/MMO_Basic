@@ -53,6 +53,8 @@ class PacketManager
 		_handler.Add((ushort)MsgId.SEquipItem, PacketHandler.S_EquipItemHandler);		
 		_onRecv.Add((ushort)MsgId.SChangeStat, MakePacket<S_ChangeStat>);
 		_handler.Add((ushort)MsgId.SChangeStat, PacketHandler.S_ChangeStatHandler);		
+		_onRecv.Add((ushort)MsgId.SPing, MakePacket<S_Ping>);
+		_handler.Add((ushort)MsgId.SPing, PacketHandler.S_PingHandler);		
 		_onRecv.Add((ushort)MsgId.SChangeMap, MakePacket<S_ChangeMap>);
 		_handler.Add((ushort)MsgId.SChangeMap, PacketHandler.S_ChangeMapHandler);
 	}

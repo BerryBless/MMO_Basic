@@ -216,6 +216,13 @@ class PacketHandler
     {
         S_ChangeStat changeStatPacket = packet as S_ChangeStat;
     }
+    public static void S_PingHandler(PacketSession session, IMessage packet)// 서버랑 핑퐁~ (계속 연결중인가 확인)
+    {
+        C_Pong pongPacket = new C_Pong();
+        Debug.Log("[Server] PingCheck");
+        Managers.Network.Send(pongPacket);
+    }
+
     public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
     {
         S_ChangeMap changeMapPacket = packet as S_ChangeMap;
