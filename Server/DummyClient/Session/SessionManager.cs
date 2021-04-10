@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+namespace DummyClient
+{
     public class SessionManager
     {
         public static SessionManager Instance { get; } = new SessionManager();
@@ -12,7 +13,6 @@ using System.Threading.Tasks;
 
         object _lock = new object();
         int _dummyId = 1;
-
 
         public ServerSession Generate()
         {
@@ -23,7 +23,7 @@ using System.Threading.Tasks;
                 _dummyId++;
 
                 _sessions.Add(session);
-                Console.WriteLine($"Connected ({_sessions.Count}) Players");
+                Console.WriteLine($"Generate ({_sessions.Count}) Players");
                 return session;
             }
         }
@@ -37,4 +37,4 @@ using System.Threading.Tasks;
             }
         }
     }
-
+}

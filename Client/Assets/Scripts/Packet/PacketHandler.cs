@@ -102,7 +102,7 @@ class PacketHandler
     public static void S_ConnectedHandler(PacketSession session, IMessage packet)// 연결
     {
         // S_Connected connectedPacket = packet as S_Connected;
-        // TODO 연결중입니다
+        // 연결중입니다
 
         Debug.Log("S_ConnectedHandler");
         C_Login loginPacket = new C_Login();
@@ -142,7 +142,7 @@ class PacketHandler
     public static void S_CreatePlayerHandler(PacketSession session, IMessage packet)// 플레이어 생성
     {
         S_CreatePlayer createOkPacket = packet as S_CreatePlayer;
-
+        Debug.Log("CreatePlayer");
         if (createOkPacket.Player == null)
         {
             // 플레이어 만들기 실패

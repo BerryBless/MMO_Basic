@@ -35,7 +35,7 @@ namespace Server.DB
                     if (success)
                     {
                         // Me
-                        room.Push(() => Console.WriteLine($"Hp Saved({playerDb.Hp})"));
+                        //room.Push(() => Console.WriteLine($"Hp Saved({playerDb.Hp})"));
                     }
                 }
             });

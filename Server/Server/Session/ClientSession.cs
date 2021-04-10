@@ -119,7 +119,7 @@ namespace Server
             });
             SessionManager.Instance.Remove(this);
 
-            Console.WriteLine($"OnDisconnected : {endPoint}");
+            //Console.WriteLine($"OnDisconnected : {endPoint}");
         }
 
         public override void OnSend(int numOfBytes)

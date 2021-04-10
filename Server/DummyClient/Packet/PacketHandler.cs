@@ -8,9 +8,11 @@ using System.Text;
 
 class PacketHandler
 {
+    // Step 4
     public static void S_EnterGameHandler(PacketSession session, IMessage packet)// "이몸등장"
     {
         S_EnterGame enterGamePacket = packet as S_EnterGame;
+        // 접속만 한상태
     }
     public static void S_LeaveGameHandler(PacketSession session, IMessage packet)// "이몸퇴장"
     {
@@ -41,17 +43,56 @@ class PacketHandler
     {
         S_Die diePacket = packet as S_Die;
     }
+
+    // Step 1
     public static void S_ConnectedHandler(PacketSession session, IMessage packet)// 연결
     {
-    }
+        C_Login loginPacket = new C_Login();
 
+        // 클라이언트 겹치지 않는 아이디를 만들려고
+        ServerSession serverSession = session as ServerSession;
+        loginPacket.UniqueId = $"DummyClient_{serverSession.DummyID.ToString("0000")}";
+
+        serverSession.Send(loginPacket);
+    }
+    // Step 2
     public static void S_LoginHandler(PacketSession session, IMessage packet)// 로그인 + 캐릭터 목록
     {
         S_Login loginPacket = packet as S_Login;
+        ServerSession serverSession = session as ServerSession;
+
+        if (loginPacket.Players == null || loginPacket.Players.Count == 0)
+        {
+            C_CreatePlayer createPacket = new C_CreatePlayer();
+            createPacket.Name = $"DummyPlayer_{serverSession.DummyID.ToString("0000")}";
+            serverSession.Send(createPacket);
+        }
+        else
+        {
+            // 무조건 첫번쨰 캐릭터 로그인
+            LobbyPlayerInfo info = loginPacket.Players[0];
+
+            C_EnterGame enterGamePacket = new C_EnterGame();
+            enterGamePacket.Name = info.Name;
+            serverSession.Send(enterGamePacket);
+        }
     }
+    // Step 3
     public static void S_CreatePlayerHandler(PacketSession session, IMessage packet)// 플레이어 생성
     {
         S_CreatePlayer createOkPacket = packet as S_CreatePlayer;
+        ServerSession serverSession = session as ServerSession;
+
+        if (createOkPacket.Player == null)
+        {
+            // 겹치는 더미클라는 없다
+        }
+        else
+        {
+            C_EnterGame enterGamePacket = new C_EnterGame();
+            enterGamePacket.Name = createOkPacket.Player.Name;
+            serverSession.Send(enterGamePacket);
+        }
     }
     public static void S_ItemListHandler(PacketSession session, IMessage packet)// 게임 처음 시작할떄 인벤토리 에 넣기
     {

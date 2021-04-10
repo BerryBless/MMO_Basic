@@ -57,7 +57,7 @@ namespace Server.Game
             }
 
             // TEMP 테스트할몬스터 만들기
-            for(int i=0;i<3000;i++){
+            for(int i=0;i<1000;i++){
                 Monster monster = ObjectManager.Instance.Add<Monster>();
                 monster.Init(1);
                 this.Push(this.EnterGame, monster, true);
