@@ -57,7 +57,7 @@ namespace Server.Game
             }
 
             // TEMP 테스트할몬스터 만들기
-            for(int i=0;i<1000;i++){
+            for(int i=0;i<200;i++){
                 Monster monster = ObjectManager.Instance.Add<Monster>();
                 monster.Init(1);
                 this.Push(this.EnterGame, monster, true);
@@ -173,6 +173,7 @@ namespace Server.Game
                 player.OnLeaveGame();
                 Map.ApplyLeave(player);
                 player.Room = null;
+                
 
                 // 본인한테 정보 전송
                 {

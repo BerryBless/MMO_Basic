@@ -34,12 +34,16 @@ namespace Server.Game
         public override void OnDead(GameObject attecker)
         {
             base.OnDead(attecker);
+            // 이 다음 업데이트할 비전큐브는 필요없다
             Vision.Clear();
+            Vision._job.Cancel = true; 
         }
 
         public void OnLeaveGame()
         {
             DbTransaction.SavePlayerStatus_AllInOne(this, Room);
+            // 이 다음 업데이트할 비전큐브는 필요없다
+            Vision._job.Cancel = true;
         }
 
         public void HandleEquipItem(C_EquipItem equipPacket)

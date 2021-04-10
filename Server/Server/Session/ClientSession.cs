@@ -18,10 +18,12 @@ namespace Server
         public PlayerServerState ServerState { get; private set; } = PlayerServerState.ServerStateLogin;
         public Player MyPlayer { get; set; }
         public int SessionId { get; set; }
-
-        // 패킷 임시저장
         List<ArraySegment<byte>> _reserveQueue = new List<ArraySegment<byte>>();
         object _lock = new object();
+
+        // 패킷 모아보내기
+        int _reservedSendBytes = 0; // 보낼려고 예약한 버퍼는 Byte 인지
+        long _lastSendTick = 0;// 마지막으로 보낸뒤 시간이 몇틱 지났는 지
 
         #region NETWORK
         // 클라랑 연결중인지
@@ -70,8 +72,8 @@ namespace Server
             {
                 // 예약만하고 보내지는 않음
                 _reserveQueue.Add(sendBuffer);
+                _reservedSendBytes += sendBuffer.Length;
             }
-            //Send(new ArraySegment<byte>(sendBuffer));
         }
 
         // 실제 보내는 부분
@@ -80,8 +82,17 @@ namespace Server
             List<ArraySegment<byte>> sendList = null;
             lock (_lock)
             {
+                // 0.1초가 지났거나 패킷이 1만바이트 이상일떄
+                long delta = (System.Environment.TickCount64 - _lastSendTick);
+                if (delta < 100 && _reservedSendBytes < 10000)
+                    return;
                 if (_reserveQueue.Count == 0)
                     return;
+
+                // 패킷 모아보내기
+                _reservedSendBytes = 0;
+                _lastSendTick = System.Environment.TickCount64;
+
                 sendList = _reserveQueue;
                 _reserveQueue = new List<ArraySegment<byte>>();
             }

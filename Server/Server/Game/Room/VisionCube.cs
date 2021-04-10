@@ -13,6 +13,9 @@ namespace Server.Game
         // Update호출전 시야에 보이는 오브젝트
         public HashSet<GameObject> PreviousObjects { get; private set; } = new HashSet<GameObject>();
 
+        // Update 추적
+        public IJob _job;
+
         public VisionCube(Player owner)
         {
             Owner = owner;
@@ -131,7 +134,7 @@ namespace Server.Game
             PreviousObjects = currentObjects;
 
             // 0.1초뒤에 다시 호출
-            Owner.Room.PushAfter(100, Update);
+            _job=Owner.Room.PushAfter(100, Update);
         }
 
     }
