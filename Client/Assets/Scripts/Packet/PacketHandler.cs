@@ -7,7 +7,6 @@ using UnityEngine;
 
 class PacketHandler
 {
-
     public static void S_EnterGameHandler(PacketSession session, IMessage packet)// "이몸등장"
     {
         S_EnterGame enterGamePacket = packet as S_EnterGame;
@@ -38,7 +37,7 @@ class PacketHandler
             Managers.Object.Remove(obj);
         }
     }
-    public static void S_MoveHandler(PacketSession session, IMessage packet)
+    public static void S_MoveHandler(PacketSession session, IMessage packet)// 무언가 이동
     {
         S_Move movePacket = packet as S_Move;
 
@@ -51,13 +50,11 @@ class PacketHandler
         BaseController bc = go.GetComponent<BaseController>();
         if (bc == null) return;
 
-
-
         //Debug.Log($"S_MoveHandler ::\n\t{cc.gameObject.name} :: CellPos ({cc.PosInfo.PosX},{cc.PosInfo.PosY}) | Dir : {cc.PosInfo.MoveDir}");
         bc.PosInfo = movePacket.PosInfo;
     }
 
-    public static void S_SkillHandler(PacketSession session, IMessage packet)
+    public static void S_SkillHandler(PacketSession session, IMessage packet) // 무언가 스킬 사용
     {
         S_Skill skillPacket = packet as S_Skill;
 
@@ -72,7 +69,7 @@ class PacketHandler
         }
 
     }
-    public static void S_ChangeHpHandler(PacketSession session, IMessage packet)
+    public static void S_ChangeHpHandler(PacketSession session, IMessage packet) // 누군가의 HP 가 줄어듦
     {
         S_ChangeHp changePacket = packet as S_ChangeHp;
 
@@ -86,7 +83,7 @@ class PacketHandler
         }
 
     }
-    public static void S_DieHandler(PacketSession session, IMessage packet)
+    public static void S_DieHandler(PacketSession session, IMessage packet) // 무언가 소멸됨
     {
         S_Die diePacket = packet as S_Die;
 
@@ -160,7 +157,6 @@ class PacketHandler
             Managers.Network.Send(enterGamePacket);
         }
     }
-
     public static void S_ItemListHandler(PacketSession session, IMessage packet)// 게임 처음 시작할떄 인벤토리 에 넣기
     {
         S_ItemList itemList = packet as S_ItemList;
@@ -174,6 +170,7 @@ class PacketHandler
         if (Managers.Object.MyPlayer != null)
             Managers.Object.MyPlayer.RefreshAdditionalStat();
     }
+
     public static void S_AddItemHandler(PacketSession session, IMessage packet)// 인게임중 아이템 획득
     {
         S_AddItem itemList = packet as S_AddItem;
@@ -216,6 +213,7 @@ class PacketHandler
     {
         S_ChangeStat changeStatPacket = packet as S_ChangeStat;
     }
+    
     public static void S_PingHandler(PacketSession session, IMessage packet)// 서버랑 핑퐁~ (계속 연결중인가 확인)
     {
         C_Pong pongPacket = new C_Pong();
@@ -223,7 +221,7 @@ class PacketHandler
         Managers.Network.Send(pongPacket);
     }
 
-    public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵바꾸기
+    public static void S_ChangeMapHandler(PacketSession session, IMessage packet)// 맵로딩
     {
         S_ChangeMap changeMapPacket = packet as S_ChangeMap;
         // TODO 맵바꾸기
