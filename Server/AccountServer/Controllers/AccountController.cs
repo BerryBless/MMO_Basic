@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,12 @@ namespace AccountServer.Controllers
     public class AccountController : ControllerBase
     {
         AppDbContext _context;
+        SharedDbContext _shared;
 
-        public AccountController(AppDbContext context)
+        public AccountController(AppDbContext context, SharedDbContext shared)
         {
             _context = context;
+            _shared = shared;
         }
 
         // 계정 생성
@@ -77,13 +80,48 @@ namespace AccountServer.Controllers
                 // 로그인
                 res.LoginOk = true;
 
-                // TODO 서버목록
-                res.ServerList = new List<ServerInfo>()
+                // 토큰발급
+                DateTime expired = DateTime.UtcNow;
+                expired.AddSeconds(600);
+
+                TokenDb tokenDb = _shared.Tokens
+                    .Where(t => t.AccountDbId == account.AccountDbId)
+                    .FirstOrDefault();
+
+                if(tokenDb != null)
                 {
-                    new ServerInfo () {Name = "칼페온", Ip ="127.0.0.1", CrowdedLevel = 1000 },
-                    new ServerInfo () {Name = "카마실비아", Ip ="127.0.0.1", CrowdedLevel = 50 },
-                    new ServerInfo () {Name = "발레리아", Ip ="127.0.0.1", CrowdedLevel = 1 },
-                };
+                    // 토큰갱신
+                    tokenDb.Token = new Random().Next(Int32.MinValue, Int32.MaxValue);
+                    tokenDb.Expired = expired;
+                    _shared.SaveChangesEx();
+                }
+                else
+                {
+                    // 토큰생성
+                    tokenDb = new TokenDb()
+                    {
+                        AccountDbId = account.AccountDbId,
+                        Token = new Random().Next(Int32.MinValue, Int32.MaxValue),
+                        Expired = expired
+                    };
+                    _shared.Add(tokenDb);
+                    _shared.SaveChangesEx();
+                }
+                res.AccountId = account.AccountDbId;
+                res.Token = tokenDb.Token;
+                res.ServerList = new List<ServerInfo>();
+
+                // 서버목록
+                foreach(ServerDb serverDb in _shared.Servers)
+                {
+                    res.ServerList.Add(new ServerInfo()
+                    {
+                        Name = serverDb.Name,
+                        IpAddress = serverDb.IpAddress,
+                        Port = serverDb.Port,
+                        BusyScore = serverDb.BusyScore
+                    }) ;
+                }
             }
 
             return res;
