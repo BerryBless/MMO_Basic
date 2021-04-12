@@ -65,8 +65,13 @@ public class UI_LoginScene : UI_Scene
 
             if (res.LoginOk)
             {
-                Managers.Network.ConnectToGame();
-                Managers.Scene.LoadScene(Define.Scene.Game);
+                // 토큰(영화표) 들고 있기
+                Managers.Network.AccountId = res.AccountId;
+                Managers.Network.Token= res.Token;
+
+                // 로그인 성공시 서버목록
+                UI_SelectServerPopup popup = Managers.UI.ShowPopupUI<UI_SelectServerPopup>();
+                popup.SetServer(res.ServerList);
             }
         });
     }
