@@ -11,8 +11,9 @@ public class GameScene : BaseScene
 
         SceneType = Define.Scene.Game;
 
-        // TODO 패킷의 맵ID에 따라 불러주기
-        // Managers.Map.LoadMap(1);
+        // TEMP Web테스트
+        Managers.Web.BaseUrl = "https://localhost:5001/api";
+        WebPacket.SendCreateAccount("asd", "123");
 
         Screen.SetResolution(640, 480, false);// 테스트용 빌드 해상도 설정
 

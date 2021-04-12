@@ -21,14 +21,14 @@ public class ServerInfo
 public class CreateAccountPacketReq
 {
     public string AccountName { get; set; }
-    public String Password { get; set; }
+    public string Password { get; set; }
 }
 
 // login
 public class LoginAccountPacketReq
 {
     public string AccountName { get; set; }
-    public String Password { get; set; }
+    public string Password { get; set; }
 }
 #endregion
 
