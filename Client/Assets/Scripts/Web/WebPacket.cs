@@ -9,9 +9,10 @@ public class ServerInfo
     // 서버이름
     public string Name;
     // 서버주소
-    public string Ip;
+    public string IpAddress;
+    public int Port;
     // 혼잡도, 높을 수 록 혼잡
-    public int CrowdedLevel;
+    public int BusyScore; 
 }
 
 // 클라에서 서버
@@ -44,6 +45,8 @@ public class CreateAccountPacketRes
 public class LoginAccountPacketRes
 {
     public bool LoginOk;
+    public int AccountId;
+    public int Token;
     public List<ServerInfo> ServerList = new List<ServerInfo>();
 }
 
