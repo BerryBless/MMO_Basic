@@ -9,7 +9,7 @@ public class UI_SelectServerPopup : UI_Popup
     public List<UI_SelectServerPopup_Item> Items { get; } = new List<UI_SelectServerPopup_Item>();
     public override void Init()
     {
-        
+        base.Init();
     }
 
     public void SetServer(List<ServerInfo> servers)

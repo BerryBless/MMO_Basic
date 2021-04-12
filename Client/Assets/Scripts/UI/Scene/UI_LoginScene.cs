@@ -16,6 +16,7 @@ public class UI_LoginScene : UI_Scene
         CreateBtn,
         LoginBtn
     }
+    // 초기화
     public override void Init()
     {
         base.Init();
@@ -27,17 +28,20 @@ public class UI_LoginScene : UI_Scene
         GetImage((int)Images.LoginBtn).gameObject.BindEvent(OnClickLoginButton);
     }
 
+    // 계정생성 버튼 클릭
     public void OnClickCreateButton(PointerEventData evt)
     {
         string account = Get<GameObject>((int)GameObjects.AccountName).GetComponent<InputField>().text;
         string password = Get<GameObject>((int)GameObjects.Password).GetComponent<InputField>().text;
 
+        // 패킷생성
         CreateAccountPacketReq packet = new CreateAccountPacketReq()
         {
             AccountName = account,
             Password = password
         };
 
+        // 계정생성 시도
         Managers.Web.SendPostRequest<CreateAccountPacketRes>("account/create", packet, (res) =>
         {
             Debug.Log($"Account Cteate : {res.CreateOk}");
@@ -45,17 +49,20 @@ public class UI_LoginScene : UI_Scene
             Get<GameObject>((int)GameObjects.Password).GetComponent<InputField>().text = "";
         });
     }
+    // 로그인 버튼 클릭
     public void OnClickLoginButton(PointerEventData evt)
     {
         string account = Get<GameObject>((int)GameObjects.AccountName).GetComponent<InputField>().text;
         string password = Get<GameObject>((int)GameObjects.Password).GetComponent<InputField>().text;
 
+        // 패킷생성
         LoginAccountPacketReq packet = new LoginAccountPacketReq()
         {
             AccountName = account,
             Password = password
         };
 
+        // 로그인시도
         Managers.Web.SendPostRequest<LoginAccountPacketRes>("account/login", packet, (res) =>
         {
             Debug.Log($"Account Login : {res.LoginOk}");
